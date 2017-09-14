@@ -1,0 +1,10 @@
+########## Version 1.0 ##########
+
+The TSD package Provides functions for reading, writing and other processing of data in the Time Step Data (TSD) format (and other utilities used by the packages SimradRaw, sonR, cpplot3d and echoIBM).
+
+
+########## Version 1.1 ##########
+
+Added the option of reading multiple TSD files with read.TSDs() and returning the data in a list with one element per file.
+
+Moved development to GitHub
