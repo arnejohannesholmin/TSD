@@ -8,7 +8,7 @@ merge_TSD(x, dir = NULL, indt = FALSE, reserve = TRUE,
   recursive = FALSE, test.TSD = FALSE, filesize = 3e+08,
   chunksize = 3e+08, clear_along = FALSE, drop.out = FALSE, adds = NULL,
   msg = TRUE, linked = list(), skipLast = FALSE, cores = 1,
-  keep.lists = FALSE, pad = TRUE, ...)
+  keep.lists = FALSE, pad = TRUE, pbar = TRUE, ...)
 }
 \arguments{
 \item{x}{is a list of TSD-data, or a directory or vector of TSD-files to be merged, in which case a new directory is created with the merged data.}
@@ -35,9 +35,11 @@ merge_TSD(x, dir = NULL, indt = FALSE, reserve = TRUE,
 
 \item{linked}{is a list of file paths of the same length as 'x' (or the file list of 'x'), holding files that should be merged using the same file grouping as used for 'x'.}
 
-\item{skipLast}{is TRUE to discard the last file in the merging, and simply copy is to the merged-directory.}
+\item{skipLast}{is TRUE to discard the last file in the merging, and simply copy it to the merged-directory.}
 
 \item{...}{are possible inputs to other functions.}
+
+\item{skipLast}{Logical: If FALSE, the progress bar is suppressed.}
 }
 \value{
 

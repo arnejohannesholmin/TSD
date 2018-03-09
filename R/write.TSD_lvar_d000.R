@@ -42,20 +42,20 @@ write.TSD_lvar_d000<-function(d000, numt){
 
 	##################################################
 	##################################################
-	ind=0
-	lvar=NULL
+	ind <- 0
+	lvar <- NULL
 	for(i in 1:numt){
-		narray=d000[ind+1]
+		narray <- d000[ind+1]
 		if(length(narray)>0){
 			if(is.na(narray)){
 				stop("Arrays at each time step is not implemented in this version")
 				}
-			thislvar=1+2*narray+sum(d000[ind+1+seq_len(narray)])
-			lvar=c(lvar, thislvar)
-			ind=ind+thislvar
+			thislvar <- 1 + 2*narray + sum(d000[ind + 1 + seq_len(narray)])
+			lvar <- c(lvar, thislvar)
+			ind <- ind + thislvar
 			}
 		else{
-			lvar=c(lvar, 0)
+			lvar <- c(lvar, 0)
 			}
 		}
 	lvar

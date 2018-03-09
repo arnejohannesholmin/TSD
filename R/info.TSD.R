@@ -80,7 +80,7 @@ info.TSD<-function(labl=NULL, file=file.path(system.file("extdata", package="TSD
 	
 	##### Output #####
 	if(clean){
-		TSD_description_table[match(labl,TSD_description_table[, 1]), 2]
+		TSD_description_table[match(labl,TSD_description_table[, 1]), ]
 		}
 	else{
 		paste("<",labl,"> ",TSD_description_table[match(labl,TSD_description_table[, 1]), 2],sep="")

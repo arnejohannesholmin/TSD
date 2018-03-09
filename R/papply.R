@@ -23,32 +23,59 @@
 #' system.time(p <- papply(1:4, f, cores=2))
 #'
 #' @importFrom parallel makeCluster parLapply stopCluster detectCores
+#' @importFrom pbapply pblapply
 #' @export
 #' @rdname papply
 #'
-papply <- function(X, FUN, ..., cores=1, outfile=""){
-	cores <- min(parallel::detectCores(), cores, length(X))
-	#msgfun <- getMSG(msg)
-	if(cores==1){
-		#if(length(formals(msgfun))){
-		#	out <- lapply(X, FUN, ..., msgfun=msgfun)
-		#}
-		#else{
-			out <- lapply(X, FUN, ...)
-		#}
+papply <- function(X, FUN, ..., cores=1, outfile="", msg="Processing... "){
+	availableCores <- parallel::detectCores()
+	# If memory runs out, a system call to determine number of cores might fail, thus detectCores() could return NA
+	# defaulting to single core if this is the case
+	if(is.na(availableCores)){
+		availableCores <- 1
 	}
-	else{
-		cl <- parallel::makeCluster(cores, outfile=outfile)
-		#if(length(formals(msgfun))){
-		#	out <- parallel::parLapply(cl, X, FUN, ..., msgfun=msgfun)
-		#}
-		#else{
-			out <- parallel::parLapply(cl, X, FUN, ...)
-		#}
+	if(cores > availableCores){
+		warning(paste0("Only ", availableCores, " cores available (", cores, " requested)"))
+	}
+	nruns <- length(X)
+	cores <- min(cores, nruns, availableCores)
+	
+	# Generate the clusters of time steps:
+	if(cores>1){
+		cat(paste0(msg, "(", nruns, " runs using ", cores, " cores in parallel):\n"))
+		cl <- parallel::makeCluster(cores)
+		# Bootstrap:
+		out <- pbapply::pblapply(X, FUN, ..., cl=cl)
+		# End the parallel bootstrapping:
 		parallel::stopCluster(cl)
 	}
-	#cat("\n")
-	out
+	else{
+		cat(paste0(msg, "(", nruns, " runs):\n"))
+		out <- pbapply::pblapply(X, FUN, ...)
+	}
+	return(out)
+	### cores <- min(parallel::detectCores(), cores, length(X))
+	### #msgfun <- getMSG(msg)
+	### if(cores==1){
+	### 	#if(length(formals(msgfun))){
+	### 	#	out <- lapply(X, FUN, ..., msgfun=msgfun)
+	### 	#}
+	### 	#else{
+	### 		out <- lapply(X, FUN, ...)
+	### 	#}
+	### }
+	### else{
+	### 	cl <- parallel::makeCluster(cores, outfile=outfile)
+	### 	#if(length(formals(msgfun))){
+	### 	#	out <- parallel::parLapply(cl, X, FUN, ..., msgfun=msgfun)
+	### 	#}
+	### 	#else{
+	### 		out <- parallel::parLapply(cl, X, FUN, ...)
+	### 	#}
+	### 	parallel::stopCluster(cl)
+	### }
+	### #cat("\n")
+	### out
 }
 ### #'
 ### #' @export

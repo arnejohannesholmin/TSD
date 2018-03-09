@@ -45,9 +45,10 @@ write.TSD_get_d000_lv<-function(y, numt, ts){
 	##################################################
 	##################################################
 	# Get the dimensions from the data, one list element for each variable:	
-	dimension = lapply(y, function(z) write.TSD_fun_d000(z, numt, ts))
+	dimension = lapply(y, write.TSD_fun_d000, numt=numt, ts=ts)
 	# Get the indices at which each variable has dimension. This is done by moving through the variables (elements in the list 'dimension') and for each element moving through the list of time steps and finding time steps with more than one dimension:
-	indx = lapply(dimension, function(z) which(unlist(lapply(z, function(w) length(w)>1), use.names=FALSE)))
+	### indx = lapply(dimension, function(z) which(unlist(lapply(z, function(w) length(w)>1), use.names=FALSE)))
+	indx = lapply(y, write.TSD_fun_d000, numt=numt, ts=ts, ind.out=TRUE)
 	# Get the variables that have dimensions at at least one time step:
 	var = which(sapply(indx, function(z) length(z)>0))
 	# Strip 'dimension' and 'indx' of empty elements:

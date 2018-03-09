@@ -31,7 +31,7 @@
 #' @export
 #' @rdname write.TSD
 #'
-write.TSD<-function(x, con, t="all", var="all", header=NULL, numt=NULL, dimension=TRUE, ts="last", reserve=0, keep.null=TRUE, dup=FALSE, endian=.Platform$endian, sep=" ", append=FALSE, ow=TRUE, keep.float=FALSE, ...){
+write.TSD<-function(x, con, t="all", var="all", header=NULL, numt=NULL, dimension=TRUE, ts="last", reserve=0, keep.null=TRUE, dup=FALSE, endian=.Platform$endian, sep=" ", append=FALSE, ow=TRUE, keep.float=FALSE, use.raw=1e3, ...){
 	
 	############ AUTHOR(S): ############
 	# Arne Johannes Holmin
@@ -61,7 +61,8 @@ write.TSD<-function(x, con, t="all", var="all", header=NULL, numt=NULL, dimensio
 	# Update: 2014-09-27 - NEW FORMAT: Added the numer of time steps 'numt' in the file as the second long (after 'nvar'), and the number of rows of 'lvar' 'r000' to speed up the reading of the header and appending to the header. Also removed non-binary writing.
 	# Update: 2014-12-12 - Added support for complex variables through the data types "cpxf" and "cpxd".
 	# Update: 2015-10-01 - Updated to treat stings simply by counting the number of characters (before the split character was included, but in the new version the character variables are collapsed to one sting per time step for each variable before using write.TSD_fun_lvar()).
-	# Last: 2016-07-04 - Fixed several bugs related to the use of 'numt' and 't', involving extracting 'lvar', 'singleindex' and dimensions first, and then subsetting these during writing.
+	# Update: 2016-07-04 - Fixed several bugs related to the use of 'numt' and 't', involving extracting 'lvar', 'singleindex' and dimensions first, and then subsetting these during writing.
+	# Last: 2017-10-10 - Multiple fixes: Generation of dimension vectors d000 streamlined and sped up by a factor of 100. This was done in functions write.TSD_get_d000_lv(), write.TSD_fun_d000(), write.TSD_modifyd000(), write.TSD_d000_lt2v(), and in this function, where x$d000Flat was introduced. Also the option use.raw was introduced, implying to convert the data into raw and write in one go, to avoid the for loop. This i currently not available for complex data. Considerably reduced time for 
 	########### DESCRIPTION: ###########
 	# Writes files using the Time Step Data format. See the documentation on echoIBM for specification of the Time Step Data format (TSD). Handling of missing values differ between data types, as given in the table below, which gives the values that are stored in the file when given as NA, NaN, NA_real_, or NA_integer_ in the data:
 	#	<value>				<data type>
@@ -110,15 +111,15 @@ write.TSD<-function(x, con, t="all", var="all", header=NULL, numt=NULL, dimensio
 	##################################################
 	##################################################
 	##### Preparation #####
-	split_char = "\u001F"
+	split_char <- "\u001F"
 	### Connection: ###
 	# Get the name of the file:
 	if("file" %in% is(con)){
-		conname = summary(con)$description
+		conname <- summary(con)$description
 		close(con)
 		}
 	else if(is.character(con)){
-		conname = con
+		conname <- con
 		if(!ow && !append && file.exists(conname)){
 			stop(paste("Cannot overwrite existing file ", conname, ". To allow owerwriting set the option 'ow' to TRUE", sep=""))
 			}
@@ -127,7 +128,7 @@ write.TSD<-function(x, con, t="all", var="all", header=NULL, numt=NULL, dimensio
 		stop("Invalid connection. Must either be a file object or a character string")
 		}
 	# 2014-02-12: It was discovered that tilde expansion is not accepted by the c++ funcitons UpdateHeaderTSD_long():
-	conname = path.expand(conname)
+	conname <- path.expand(conname)
 	### End of Connection ###
 	
 	### Clean 'x': ###
@@ -137,52 +138,52 @@ write.TSD<-function(x, con, t="all", var="all", header=NULL, numt=NULL, dimensio
 		}
 	
 	# Remove header elements and "info" from 'x' if present:
-	headerind = na.omit(match(c("nvar", "lvar", "labl", "dtyp", "numt", "r000", "d000", "info"), names(x)))
+	headerind <- na.omit(match(c("nvar", "lvar", "labl", "dtyp", "numt", "r000", "d000", "info"), names(x)))
 	if(length(headerind)>0){
-		x = x[-headerind]
+		x <- x[-headerind]
 		}
 	# Remove NULL-elements from 'x' if specified:
 	if(any(is.na(names(x)))){
 		#warning("There were elements of 'x' with missing names. These elements were not written to file")
-		x = x[!is.na(names(x))]
+		x <- x[!is.na(names(x))]
 		}
 	if(!keep.null){
-		nullelements = unlist(lapply(x, length), use.names=FALSE) == 0
-		x = x[!nullelements]
+		nullelements <- unlist(lapply(x, length), use.names=FALSE) == 0
+		x <- x[!nullelements]
 		}
-	funs = sapply(x, is.function)
+	funs <- sapply(x, is.function)
 	
 	# Transform funcitons to strings, adding the string "_FUNCTION_" at the start. This is then used at reading to convert back to function:
 	if(any(funs)){
-		x[funs] = lapply(x[funs], function(xx) if(is.list(xx)) lapply(xx, function2character, fname="FUNCTION") else function2character(xx, fname="FUNCTION"))
+		x[funs] <- lapply(x[funs], function(xx) if(is.list(xx)) lapply(xx, function2character, fname="FUNCTION") else function2character(xx, fname="FUNCTION"))
 		}
 	### End of Clean 'x' ###
 	
 		
 	### Header: ###
 	# Number of variables:
-	header$nvar = as.double(length(x))
+	header$nvar <- as.double(length(x))
 	# If not given or not of the same length as the non-header elements of 'x', the variable labels are read from the names of 'x' (only four character names written):
 	if(length(header$labl)!= header$nvar){
 		if(length(header$labl)>0){
 			warning(paste("Variable labels specified in 'header' do not match the data (number of variables = ", header$nvar, ", length of header$labl = ", length(header$labl), ")", sep=""))
 			}
-		header$labl = names(x)
+		header$labl <- names(x)
 		}
 	# Remove all variables with non-four-character labels:
 	if(any(nchar(header$labl)!= 4)){
-		fourcharind = nchar(header$labl) == 4
+		fourcharind <- nchar(header$labl) == 4
 		#warning(paste("Only elements having 4 character names written to file: (\"", paste(header$labl[!fourcharind], collapse = "\", \""), "\")", sep = ""))
-		x = x[fourcharind]
-		header$labl = header$labl[fourcharind]
-		header$nvar = as.double(length(x))
+		x <- x[fourcharind]
+		header$labl <- header$labl[fourcharind]
+		header$nvar <- as.double(length(x))
 		}
 	# If dup = FALSE, remove variables with duplicated labels:
 	if(!dup){
-		dup = duplicated(header$labl)
-		x = x[!dup]
-		header$labl = header$labl[!dup]
-		header$nvar = as.double(length(x))
+		dup <- duplicated(header$labl)
+		x <- x[!dup]
+		header$labl <- header$labl[!dup]
+		header$nvar <- as.double(length(x))
 		}
 	if(length(x)==0){
 		# 0Write the TSD file format identifyer (magic number):
@@ -195,193 +196,198 @@ write.TSD<-function(x, con, t="all", var="all", header=NULL, numt=NULL, dimensio
 		# Insert the data types specified in the header as a list with elements named by the corresponding variable lables:
 		if(length(header$dtyp)>0 && is.list(header$dtyp)){
 			# First remove variables that are not present in 'labl':
-			header$dtypOld = header$dtyp[names(header$dtyp) %in% header$labl]
-			header["dtyp"] = list(NULL)
+			header$dtypOld <- header$dtyp[names(header$dtyp) %in% header$labl]
+			header["dtyp"] <- list(NULL)
 			}
 		if(length(header$dtyp)>0){
 			warning(paste("Variable types specified in 'header' do not match the data (number of variables = ", header$nvar, ", length of header$dtyp = ", length(header$dtyp), ")", sep=""))
 			}
 		# 'timeind' are the indices of the time variables, 'charind' are the indices og the character variables and 'intind' are the indices og the integer variables:
-		timeind = header$labl %in% c("mtim", "utim", "utmp", "utma", "ctim", "ftim", "imtm", "iutm", "ictm", "iftm", "u000")
-		charind = unlist(lapply(x, is.charTSD_element), use.names=FALSE)
-		doubind = logical(length(x))
+		timeind <- header$labl %in% c("mtim", "utim", "utmp", "utma", "ctim", "ftim", "imtm", "iutm", "ictm", "iftm", "u000")
+		charind <- unlist(lapply(x, is.charTSD_element), use.names=FALSE)
+		doubind <- logical(length(x))
 		if(!keep.float){
-			doubind = unlist(lapply(x, is.doubleTSD_element), use.names=FALSE) # TIME DEMANDING (0.2 sec for 1324*500*117 values)
+			doubind <- unlist(lapply(x, is.doubleTSD_element), use.names=FALSE) # TIME DEMANDING (0.2 sec for 1324*500*117 values)
 			}
-		intind = unlist(lapply(x, is.integerTSD_element), use.names=FALSE)
-		cmpxind = unlist(lapply(x, is.complexTSD_element), use.names=FALSE)
+		intind <- unlist(lapply(x, is.integerTSD_element), use.names=FALSE)
+		cmpxind <- unlist(lapply(x, is.complexTSD_element), use.names=FALSE)
 		# Setting variale type from the indices above (defaulted to float for numerics):
-		header$dtyp = rep("floa", length.out = length(x))
-		header$dtyp[which(timeind | doubind)] = "doub"
-		header$dtyp[which(charind)] = "char"
-		header$dtyp[which(intind)] = "long"
-		header$dtyp[which(cmpxind & !(timeind | doubind))] = "cpxf"
-		header$dtyp[which(cmpxind & (timeind | doubind))] = "cpxd"
+		header$dtyp <- rep("floa", length.out = length(x))
+		header$dtyp[which(timeind | doubind)] <- "doub"
+		header$dtyp[which(charind)] <- "char"
+		header$dtyp[which(intind)] <- "long"
+		header$dtyp[which(cmpxind & !(timeind | doubind))] <- "cpxf"
+		header$dtyp[which(cmpxind & (timeind | doubind))] <- "cpxd"
 		# If appending, set 'dtyp' of all empty elements to NA (using 'charind', but any other could be used). See comment to 'rowIndexNA':
 		if(append){
-			header$dtyp[is.na(charind)] = NA
+			header$dtyp[is.na(charind)] <- NA
 			}
 		# ????
 		if(length(header$dtypOld)>0 && is.list(header$dtypOld)){
-			header$dtyp[match(names(header$dtypOld), header$labl)] = unlist(header$dtypOld, use.names=FALSE)
+			header$dtyp[match(names(header$dtypOld), header$labl)] <- unlist(header$dtypOld, use.names=FALSE)
 			}
 		}
 		
 	# The input can be used to override header$numt, in which case the parameter 'ts' is set to NULL. This implies that character variables are written as one time step (unless the number of string elements equal the number of time steps), and other variables are assumed to have time along the last dimension:    	
 	if(length(numt)>0){
-		header$numt = numt
-		ts = NULL
+		# Unlist in case a list is accidently given:
+		header$numt <- unlist(numt[1])
+		ts <- NULL
 		#if(numt>1){
-			#ts = NULL
+			#ts <- NULL
 		#	}
 		}
 	# The number of time steps is otherwise extracted from the data using write.TSD_fun_numt():
 	else{
-		# header$numt = max(unlist(lapply(x, function(y) write.TSD_fun_numt(y, ts))), na.rm=TRUE)
-		header$numt = max(unlist(lapply(x, write.TSD_fun_numt, ts=ts), use.names=FALSE), na.rm=TRUE)
+		# header$numt <- max(unlist(lapply(x, function(y) write.TSD_fun_numt(y, ts))), na.rm=TRUE)
+		header$numt <- max(unlist(lapply(x, write.TSD_fun_numt, ts=ts), use.names=FALSE), na.rm=TRUE)
 		}
 	
+	
 	# Paste together all elelments of string vectors for each time step:
-	charind = unlist(lapply(x, is.charTSD_element), use.names=FALSE)
-	# x[which(charind)] = lapply(x[which(charind)], function(y) write.TSD_collapse_string(y, header$numt, split_char, ts))
-	x[which(charind)] = lapply(x[which(charind)], write.TSD_collapse_string, numt=header$numt, split_char="\u001F", ts=ts)
+	charind <- unlist(lapply(x, is.charTSD_element), use.names=FALSE)
+	# x[which(charind)] <- lapply(x[which(charind)], function(y) write.TSD_collapse_string(y, header$numt, split_char, ts))
+	x[which(charind)] <- lapply(x[which(charind)], write.TSD_collapse_string, numt=header$numt, split_char="\u001F", ts=ts)
 
 	# Get the lengths of the variables:
-	#header$lvar = matrix(unlist(lapply(x, function(y) write.TSD_fun_lvar(y, header$numt, ts)), use.names=FALSE), ncol=length(x))
-	header$lvar = matrix(unlist(lapply(x, write.TSD_fun_lvar, numt=header$numt, ts=ts), use.names=FALSE), ncol=length(x))
+	#header$lvar <- matrix(unlist(lapply(x, function(y) write.TSD_fun_lvar(y, header$numt, ts)), use.names=FALSE), ncol=length(x))
+	header$lvar <- matrix(unlist(lapply(x, write.TSD_fun_lvar, numt=header$numt, ts=ts), use.names=FALSE), ncol=length(x))
 	
 	# If var == "all", all variables are written:
 	if(identical(var, "all")){
-		var = 1:header$nvar
+		var <- 1:header$nvar
 		}
 	# If var == "none", no variables are written:
 	if(identical(var, "none")){
-		var = 0
+		var <- 0
 		}
 	# If 'var' is given as a vector of four character variable names, the vector is matched to the lables of the input file variables:
 	if(is.character(var)){
-		var = which(header$labl %in% var)
+		var <- which(header$labl %in% var)
 		}
 	# Crop the variables 'var' to the interval [1, header$nvar]:
-	var = var[var>= 1 & var<= header$nvar]
+	var <- var[var>= 1 & var<= header$nvar]
 	
 	# If 'dimension' is TRUE or given as a list of lists or a vector (see description of 'dimension') dimension data are included in the file:
 	if(header$numt>0 && !identical(dimension, FALSE)){
-		if(is.list(dimension)){
-			x$d000 = write.TSD_d000_lt2v(dimension, header$numt)
-			}
-		else if(!isTRUE(dimension) && is.numeric(dimension)){
-			x$d000 = dimension
-			}
-		else if(isTRUE(dimension)){
+		### if(is.list(dimension)){
+		### 	x$d000 <- write.TSD_d000_lt2v(dimension, header$numt)
+		### 	}
+		### else if(!isTRUE(dimension) && is.numeric(dimension)){
+		### 	x$d000 <- dimension
+		### 	}
+		#else 
+		if(isTRUE(dimension)){
 			if(is.null(x$d000)){
-				dimension = write.TSD_get_d000_lv(x, header$numt, ts)
-				x$d000 = write.TSD_d000_lv2lt(dimension, header$numt)
-				x$d000 = write.TSD_d000_lt2v(x$d000, header$numt)
+				dimension <- write.TSD_get_d000_lv(x, header$numt, ts)
+				x$d000 <- write.TSD_d000_lv2lt(dimension, header$numt)
+				x$d000Flat <- write.TSD_d000_lt2v(x$d000, header$numt)
 				# Update the header with the specifications of the dimension data:
-				header$nvar = header$nvar+1
-				header$lvar = cbind(header$lvar, write.TSD_lvar_d000(x$d000, header$numt))
-				header$labl = c(header$labl, "d000")
-				header$dtyp = c(header$dtyp, "long")
-				var = c(var, header$nvar)
-				}
-			}
-		# Assure integer type of 'x$d000':
-		if(length(x$d000)>0){
-			x$d000 = as.integer(x$d000)
+				header$nvar <- header$nvar+1
+				#header$lvar <- cbind(header$lvar, write.TSD_lvar_d000(x$d000, header$numt))
+				header$lvar <- cbind(header$lvar, sapply(x$d000Flat, length))
+				header$labl <- c(header$labl, "d000")
+				header$dtyp <- c(header$dtyp, "long")
+				var <- c(var, header$nvar)
 			}
 		}
+		### # Assure integer type of 'x$d000':
+		### if(length(x$d000)>0){
+		### 	x$d000 <- as.integer(x$d000)
+		### 	}
+	}
 	
 	# 'singleindex' is defined differently from 'index' used in read.TSD, and is only used for the elements of the data that are vectors or multidimensional arrays, to write the correct elements:
-	singleindex = aperm(apply(header$lvar, 2, function(y) c(0, cumsum(y))))
+	singleindex <- aperm(apply(header$lvar, 2, function(y) c(0, cumsum(y))))
 	
 	# If t == "all", all time points are written:
 	if(identical(t, "all")){
-		t = 1:header$numt
+		t <- 1:header$numt
 		}
 	# If t == "none", no time points are written:
 	if(identical(t, "none")){
-		t = 0
+		t <- 0
 		}
 	# Crop the time points 't' to the interval [1, x$numt]:
-	t = t[t>= 1 & t<= header$numt]
+	t <- t[t>= 1 & t<= header$numt]
 	
 	# Subset 'lvar' by 't':
-	header$lvar = header$lvar[t, , drop=FALSE]
-	header$numt = length(t)
+	header$lvar <- header$lvar[t, , drop=FALSE]
+	header$numt <- length(t)
 	if(length(header$lvar) == 0){
-		header$lvar = matrix(0, nrow=1, ncol=length(x))
+		header$lvar <- matrix(0, nrow=1, ncol=length(x))
 	}
 	
 	
 	# Reserve space in the header for future appending:
 	if(reserve>0 && !append){
-		reservedim = c(reserve, header$nvar)
-		reserve0 = double(prod(reservedim))
-		dim(reserve0) = reservedim
-		header$lvar = rbind(header$lvar, reserve0)
+		reservedim <- c(reserve, header$nvar)
+		reserve0 <- double(prod(reservedim))
+		dim(reserve0) <- reservedim
+		header$lvar <- rbind(header$lvar, reserve0)
 		}
 	
 	# Indicator for unequal lengths of variables for each time step:
-	unequal = !all(apply(header$lvar, 2, function(y) mean(y) == y))
+	unequal <- !all(apply(header$lvar, 2, function(y) mean(y) == y))
 	
 	# Get the number of rows of the 'lvar' which is written to the file:
 	if(unequal){
-		header$r000 = nrow(header$lvar)
+		header$r000 <- nrow(header$lvar)
 		}
 	else{
-		header$r000 = 1
+		header$r000 <- 1
 		}
 	
 	# Different method for writing if a variable is of list type or of array type:
-	listtype = sapply(x, is.list)
+	listtype <- sapply(x, is.list)
 	# Change lvar for complex variables:
-	arecomplex = substr(header$dtyp,1,3) == "cpx"
-	arecomplex[is.na(arecomplex)] = FALSE
+	arecomplex <- substr(header$dtyp,1,3) == "cpx"
+	arecomplex[is.na(arecomplex)] <- FALSE
 	if(any(arecomplex)){
-		header$lvar[,arecomplex] = header$lvar[,arecomplex]*2
+		header$lvar[,arecomplex] <- header$lvar[,arecomplex]*2
 		}
 	### End of Header ###
 	
 	##### Execution #####
 	if(append){
 		# Read the header of the existing file:
-		header_old = read.TSD(conname, var=NULL, header=TRUE, d000.out=TRUE)
+		header_old <- read.TSD(conname, var=NULL, header=TRUE, d000.out=TRUE)
 		if(length(header_old)==0){
 			return(FALSE)
 		}
 		
 		# Get the number of reserved time steps of the existing file:
-		reserved = header_old$r000 - header_old$numt
+		reserved <- header_old$r000 - header_old$numt
 		
 		# Match the variables in the data and the existing file, and remove variables that will not be written to file:
-		matchlabl = match(header$labl, header_old$labl)
+		matchlabl <- match(header$labl, header_old$labl)
 		# Create a two column matrix with which of the variables in 'x' that are present in the existing file in the first column, and the indices of these variables in the existing file in the second column:
-		matchlablNA = is.na(matchlabl)
-		lablPresent = cbind(which(!matchlablNA), matchlabl[!matchlablNA])
+		matchlablNA <- is.na(matchlabl)
+		lablPresent <- cbind(which(!matchlablNA), matchlabl[!matchlablNA])
 		# Intersect with 'var':
-		lablPresent = lablPresent[lablPresent[, 1] %in% var, ]
+		lablPresent <- lablPresent[lablPresent[, 1] %in% var, ]
 		# Update 'var' to agree with the existing file:
-		var = lablPresent[, 1][order(lablPresent[, 2])]
+		var <- lablPresent[, 1][order(lablPresent[, 2])]
 		# Change the 'lvar' to match the existing file:
-		appenddim = c(nrow(header$lvar), ncol(header_old$lvar))
-		lvarToAppend = double(prod(appenddim))
-		dim(lvarToAppend) = appenddim
-		lvarToAppend[, lablPresent[, 2]] = header$lvar[, lablPresent[, 1]]
+		appenddim <- c(nrow(header$lvar), ncol(header_old$lvar))
+		lvarToAppend <- double(prod(appenddim))
+		dim(lvarToAppend) <- appenddim
+		lvarToAppend[, lablPresent[, 2]] <- header$lvar[, lablPresent[, 1]]
 		
 		# Empty list elements in 'x' are identified by NA in header$dtyp, and are set to the 'dtyp' in the extisting file (if append = FALSE, they are set to "floa"):
-		rowIndexNA = is.na(header$dtyp[lablPresent[, 1]])
-		header$dtyp[lablPresent[, 1]][rowIndexNA] = header_old$dtyp[lablPresent[, 2]][rowIndexNA]
+		rowIndexNA <- is.na(header$dtyp[lablPresent[, 1]])
+		header$dtyp[lablPresent[, 1]][rowIndexNA] <- header_old$dtyp[lablPresent[, 2]][rowIndexNA]
 		
 		# Check for consistancy between old and new dtyp:
-		dtypUnequal = header_old$dtyp[lablPresent[, 2]] !=  header$dtyp[lablPresent[, 1]]
+		dtypUnequal <- header_old$dtyp[lablPresent[, 2]] !=  header$dtyp[lablPresent[, 1]]
 		if(any(dtypUnequal)){
 			warning(paste0("The following variables were converted to the corresponding data types of the existing file: ", paste(which(dtypUnequal), collapse=", ")))
-			header$dtyp[lablPresent[dtypUnequal, 1]] = header_old$dtyp[lablPresent[dtypUnequal, 2]]
+			header$dtyp[lablPresent[dtypUnequal, 1]] <- header_old$dtyp[lablPresent[dtypUnequal, 2]]
 			}
 		
-		# Also modify 'd000' t0 fit the file:
-		x$d000 = write.TSD_modifyd000(x$d000, lablPresent)
+		# Also modify 'd000' to fit the file:
+		x$d000 <- write.TSD_modifyd000(x$d000, lablPresent)
+		x$d000Flat <- write.TSD_d000_lt2v(x$d000, header$numt)
 				
 		# Warning if variables do not match the existing file:
 		if(any(is.na(matchlabl))){
@@ -389,28 +395,28 @@ write.TSD<-function(x, con, t="all", var="all", header=NULL, numt=NULL, dimensio
 			}
 		# Warning if there is insufficient reserved space in the header for appending the variables (only when header_old$lvar is a matrix):
 		if(prod(dim(header_old$lvar)) > header_old$nvar && header$numt>reserved){
-			t = t[seq_len(reserved)]
+			t <- t[seq_len(reserved)]
 			warning(paste0("Too few time steps reserved in the file \"", conname, "\". Not all time steps appended to the file (", paste(t, collapse=", "), ")"))
 			}
 		
 		# No changes to the header if all variables have equal length (!unequal), AND the existing header has only one row (header_old$r000 == 1), AND the 'lvar' of the existing and current header aggree (all(header_old$lvar == header$lvar[1, ])):
 		if(!unequal && header_old$r000 == 1 && all(header_old$lvar == header$lvar[1, ])){
-			headerappend = FALSE
+			headerappend <- FALSE
 			}
 		else if(header_old$r000-header_old$numt >=  header$numt){
-			headerappend = TRUE
+			headerappend <- TRUE
 			}
 		else{
 			warning(paste0("Variables not match the existing file (", conname, ") . Use 'reserve' to reserve space for variables of unequal length over 'reserve time steps'. Old 'lvar':\n", paste(apply(header_old$lvar, 1, paste, collapse=", "), collapse="\n"), "\n for variables\n", paste(header_old$labl, collapse=", "), "\n\nCurrent 'lvar':\n", paste(apply(header$lvar, 1, paste, collapse=", "), collapse="\n")))
 			return("Error:reserve")
 			}
-		endian = header_old$endian
+		endian <- header_old$endian
 		}
 		
 	# Open connection:
 	if(length(conname)>1){
 		warning(paste("More than one file path given. The first chosen: ", conname[1]))
-		conname = conname[1]
+		conname <- conname[1]
 		}
 	if(append){
 		#tryCatch(con<-file(conname, "ab"), error=function(err) paste("Cannot open the connection", conname, "(package:TSD)"))
@@ -461,65 +467,133 @@ write.TSD<-function(x, con, t="all", var="all", header=NULL, numt=NULL, dimensio
 			UpdateHeaderTSD(conname, c(t(lvarToAppend)), 16 + 4*header_old$numt*header_old$nvar, endian)
 			}
 		# The code below did not work, so a C++ function is called (see "UpdateHeaderTSD.R"):
-		#seek(con, where = 4+4*header_old$numt*header_old$nvar, origin = "start")
+		#seek(con, where <- 4+4*header_old$numt*header_old$nvar, origin = "start")
 		#writeBin(c(t(header$lvar)), con, size = 4, endian = endian)
 		}
 		
 	# Determining the sizes of the output data types:	
-	datasizes = c(1, 1, 2, 4, 4, 8, 4, 8)
-	datasizes = datasizes[match(header$dtyp, c("char", "byte", "shrt", "long", "floa", "doub", "cpxf", "cpxd"))]
+	datasizes <- c(1, 1, 2, 4, 4, 8, 4, 8)
+	datasizes <- datasizes[match(header$dtyp, c("char", "byte", "shrt", "long", "floa", "doub", "cpxf", "cpxd"))]
 	
+	
+	if(length(x$d000Flat)){
+		x$d000 <- x$d000Flat
+	}
+	
+	
+	# If all variables are requested for a continuous sequence of time steps, and the number of values per time step is not high, read all the data as raw, and convert to the apropriate variables afterwards:
+	if(is.numeric(use.raw)){
+		use.raw <- sum(header$lvar[t[1],])<use.raw
+		}
+		
+	if(use.raw && !any(arecomplex)){
+		thislvar <- header$lvar[t, var, drop=FALSE]
+		thislvarBytes <- thislvar * rep(datasizes, each=nrow(thislvar))
+		index <- c(0, cumsum(c(t(thislvarBytes)))[-(length(thislvar))])
+		index <- matrix(index, nrow=nrow(thislvar), ncol=ncol(thislvar), byrow=TRUE)
+	
+		nraw <- sum(thislvarBytes)
+		towrite <- raw(nraw)
+		x <- lapply(x, unlist, use.names=FALSE)
+			
+		if(unequal){
+			# Simple function for getting the indices at which to insert the data into the raw vector:
+			insertIndices <- function(index, thislvarBytes, i){
+				starts <- rep(index[, i], thislvarBytes[, i])
+				steps <- sequence(thislvarBytes[, i])
+				starts + steps
+			}
+			# Run through the variables and insert into the raw vector:
+			for(i in var){
+				if(header$dtyp[i] == "char"){
+					towrite[insertIndices(index, thislvarBytes, i)] <- writeChar(as.character(x[[i]]), raw(), eos=NULL)
+					#charToRaw(as.character(x[[i]]))
+				}
+				else if(!header$dtyp[i] %in% c("shrt", "long")){
+					towrite[insertIndices(index, thislvarBytes, i)] <- writeBin(as.double(x[[i]]), raw(), size=datasizes[i])
+				}
+				else if(header$dtyp[i] %in% c("shrt", "long")){
+					towrite[insertIndices(index, thislvarBytes, i)] <- writeBin(as.integer(x[[i]]), raw(), size=datasizes[i])
+				}
+			}
+		}
+		else{
+			dim(towrite) <- c(length(towrite) / length(t), length(t))
+			# Run through the variables and insert into the raw matrix:
+			for(i in var){
+				theseRows <- index[1, i] + seq_len(thislvarBytes[1, i])
+			
+				if(header$dtyp[i] == "char"){
+					towrite[theseRows, ] <- writeChar(as.character(x[[i]]), raw(), eos=NULL)
+					#charToRaw(as.character(x[[i]]))
+				}
+				else if(!header$dtyp[i] %in% c("shrt", "long")){
+					towrite[theseRows, ] <- writeBin(as.double(x[[i]]), raw(), size=datasizes[i])
+				}
+				else if(header$dtyp[i] %in% c("shrt", "long")){
+					towrite[theseRows, ] <- writeBin(as.integer(x[[i]]), raw(), size=datasizes[i])
+				}
+			}
+			towrite <- c(towrite)
+		}
+		writeBin(towrite, con)
+	}
 	# For loop through the time steps and variables:
 	### Note that the header has been stripped to the time steps that are to be written, whereas all time steps exist in the original data 'x'. Thus the index is 'p' in 'header$lvar' and 'singleindex', and thist = t[p] in 'x': ###
-	for(p in seq_along(t)){
-		thist = t[p]
-		for(i in var){
-			if(header$lvar[p, i]!= 0){
-				# Write characters:
-				if(header$dtyp[i] == "char"){
-					if(!is.character(x[[i]][thist])){
-						x[[i]][thist] = as.character(x[[i]][thist])
+	else{
+		for(p in seq_along(t)){
+			thist <- t[p]
+			for(i in var){
+				if(header$lvar[p, i]!= 0){
+					# Write characters:
+					if(header$dtyp[i] == "char"){
+						if(!is.character(x[[i]][thist])){
+							x[[i]][thist] <- as.character(x[[i]][thist])
 						}
-					writeChar(x[[i]][thist], con, nchars=header$lvar[p, i], eos = NULL)
+						writeChar(x[[i]][thist], con, nchars=header$lvar[p, i], eos=NULL)
 					}
-				# If a list is given for each variable:
-				else if(listtype[i]){
-					# If the variable is of integer type but not specified as such, convert to double:
-					if(!header$dtyp[i] %in% c("shrt", "long") && is.integer(x[[i]][[thist]])){
-						x[[i]][[thist]] = as.double(x[[i]][[thist]])
+					# If a list is given for each variable:
+					else if(listtype[i]){
+						# If the variable is of integer type but not specified as such, convert to double:
+						if(!header$dtyp[i] %in% c("shrt", "long") && is.integer(x[[i]][[thist]])){
+							x[[i]][[thist]] <- as.double(x[[i]][[thist]])
 						}
-					# If the variable is not of integer type but specified as such, convert to integer:
-					else if(header$dtyp[i] %in% c("shrt", "long") && !is.integer(x[[i]][[thist]])){
-						x[[i]][[thist]] = as.integer(x[[i]][[thist]])
+						# If the variable is not of integer type but specified as such, convert to integer:
+						else if(header$dtyp[i] %in% c("shrt", "long") && !is.integer(x[[i]][[thist]])){
+							x[[i]][[thist]] <- as.integer(x[[i]][[thist]])
 						}
-					# If complex, collapse to a vector with real first then imaginary:
-					if(arecomplex[i]){
-						writeBin(c(Re(x[[i]][[thist]]), Im(x[[i]][[thist]])), con, size = datasizes[i], endian = endian)
+						# If complex, collapse to a vector with real first then imaginary:
+						if(arecomplex[i]){
+							writeBin(c(Re(x[[i]][[thist]]), Im(x[[i]][[thist]])), con, size = datasizes[i], endian = endian)
 						}
-					else{
-						writeBin(c(x[[i]][[thist]]), con, size = datasizes[i], endian = endian)
+						else{
+							writeBin(c(x[[i]][[thist]]), con, size = datasizes[i], endian = endian)
 						}
 					}
-				else{
-					# If the variable is of integer type but not specified as such, convert to double:
-					if(!header$dtyp[i] %in% c("shrt", "long") && is.integer(x[[i]])){
-						x[[i]] = as.double(x[[i]])
-						}
-					# If the variable is not of integer type but specified as such, convert to integer:
-					else if(header$dtyp[i] %in% c("shrt", "long") && !is.integer(x[[i]])){
-						x[[i]] = as.integer(x[[i]])
-						}
-					# If complex, collapse to a vector with real first then imaginary:
-					if(arecomplex[i]){
-						writeBin(c(Re(x[[i]][(singleindex[i, thist]+1):singleindex[i, thist+1]]), Im(x[[i]][(singleindex[i, thist]+1):singleindex[i, thist+1]])), con, size = datasizes[i], endian = endian)
-						}
 					else{
-						writeBin(c(x[[i]][(singleindex[i, thist]+1):singleindex[i, thist+1]]), con, size = datasizes[i], endian = endian)
+						# If the variable is of integer type but not specified as such, convert to double:
+						if(!header$dtyp[i] %in% c("shrt", "long") && is.integer(x[[i]])){
+							x[[i]] <- as.double(x[[i]])
+						}
+						# If the variable is not of integer type but specified as such, convert to integer:
+						else if(header$dtyp[i] %in% c("shrt", "long") && !is.integer(x[[i]])){
+							x[[i]] <- as.integer(x[[i]])
+						}
+						# If complex, collapse to a vector with real first then imaginary:
+						if(arecomplex[i]){
+							writeBin(c(Re(x[[i]][(singleindex[i, thist]+1):singleindex[i, thist+1]]), Im(x[[i]][(singleindex[i, thist]+1):singleindex[i, thist+1]])), con, size = datasizes[i], endian = endian)
+						}
+						else{
+							writeBin(c(x[[i]][(singleindex[i, thist]+1):singleindex[i, thist+1]]), con, size = datasizes[i], endian = endian)
 						}
 					}
 				}
 			}
 		}
+	}
+	
+	
+	
 	close(con)
 	
 	##### Output #####

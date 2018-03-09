@@ -7,7 +7,7 @@
 read.TSD(con, t = 1, var = "all", dimension = TRUE, header = FALSE,
   max_var = 1e+10, indt = FALSE, d000.out = FALSE, keep.all = FALSE,
   drop.out = TRUE, info = FALSE, silent = !getOption("verbose"),
-  raw = 1000)
+  use.raw = 1000)
 }
 \arguments{
 \item{con}{is the file object or the name of the TSD-file to be read.}
@@ -34,7 +34,7 @@ read.TSD(con, t = 1, var = "all", dimension = TRUE, header = FALSE,
 
 \item{silent}{is FALSE to print progress bar. If the 'silent' should be set to FALSE in general, use options(verbose=TRUE).}
 
-\item{raw}{is TRUE to read files quicker by reading the information as raw, and converting to the appropriate data types aferwards, which olny applies if the number of time steps exceed 20 and the number of values of the file does not exceed 'raw'.}
+\item{use.raw}{is TRUE to read files quicker by reading the information as raw, and converting to the appropriate data types aferwards, which olny applies if the number of time steps exceed 20 and the number of values of the file does not exceed 'use.raw'.}
 }
 \value{
 

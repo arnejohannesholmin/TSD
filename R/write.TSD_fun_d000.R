@@ -14,7 +14,7 @@
 #' @export
 #' @rdname write.TSD_fun_d000
 #'
-write.TSD_fun_d000<-function(y, numt, ts){
+write.TSD_fun_d000<-function(y, numt, ts, ind.out=FALSE){
 	
 	############ AUTHOR(S): ############
 	# Arne Johannes Holmin
@@ -46,11 +46,24 @@ write.TSD_fun_d000<-function(y, numt, ts){
 	##################################################
 	# List elements:
 	if(is.list(y)){
+		# Empty variables get either 0 or NULL depending on ind.out=F/T:
 		if(length(y) == 0){
-			list(0)
+			if(ind.out){
+				return(integer(0))
 			}
+			else{
+				return(list(0))
+			}
+		}
+		# Get the dims of each list element, or a vector of which list elements having dimension depending on ind.out=F/T:
 		else{
-			d000 = lapply(y, dim)
+			if(ind.out){
+				return(which(unlist(lapply(y, function(x) length(dim(x))>0), use.names=FALSE)))
+			}
+			else{
+				return(lapply(y, dim))
+			}
+			#d000 = lapply(y, dim)
 			}
 		}
 	# Array elements:
@@ -61,11 +74,33 @@ write.TSD_fun_d000<-function(y, numt, ts){
 		
 		# If the last dimension is in 'thists' (which is the dimension indices of the current array that are selected or disselected by 'ts'), or if the last dimension is equal to 'numt', regard this dimension as the time dimension:
 		if(length(d) && ((ld %in% thists && ld>1) || (d[ld] == numt))){
-			d000 = rep(list(d[-ld]), d[ld])
+			if(ind.out){
+				if(length(d[-ld])>1){
+					return(seq_len(d[ld]))
+				}
+				else{
+					return(integer(0))
+				}
+			}
+			else{
+				return(rep(list(d[-ld]), d[ld]))
+			}
+			#d000 = rep(list(d[-ld]), d[ld])
 			}
 		# Else write only one time step, and set the dimension of that time step to the dimension of the array:
 		else{
-			d000 = list(d)
+			if(ind.out){
+				if(length(d)>1){
+					return(1)
+				}
+				else{
+					return(integer(0))
+				}
+			}
+			else{
+				return(list(d))
+			}
+			#d000 = list(d)
 			}
 		}
 	##################################################

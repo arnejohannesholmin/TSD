@@ -55,56 +55,58 @@ labl.TSD <- function(var=NULL, adds=NULL, list.out=TRUE){
 	##################################################
 	########## Preparation ##########
 	# Time variables:
-	acousticnames = c("mvbs", "vbsc", "tlns")
+	acousticnames <- c("mvbs", "vbsc", "tlns")
 	
-	timenames = c("utim", "mtim", "ftim", "indt")
-	#timenames = c("utim", "mtim", "ctim", "ftim", "indt")
+	timenames <- c("utim", "mtim", "ftim", "indt")
+	#timenames <- c("utim", "mtim", "ctim", "ftim", "indt")
 	# The variable names of the vessel:
-	vesselnames = c("psxv", "psyv", "pszv", "rtxv", "rtyv", "rtzv", "lonv", "latv", "lat0", "lon0", "ispv", "sadv")
+	vesselnames <- c("psxv", "psyv", "pszv", "rtxv", "rtyv", "rtzv", "lonv", "latv", "lat0", "lon0", "ispv", "sadv")
 	
 	# The compactly specified dynamic variable names of the school:
-	compactschool = c("psxS", "psyS", "pszS", "utmS", "ut9S", "aspS", "thtS", "phiS", "szxS", "szyS", "szzS", "rtxS", "rtyS", "rtzS", "SDxf", "SDyf", "SDzf", "sEdx", "sEdy", "sEdz", "shpS", "rhoS", "nbfS", "volS", "MEsz", "SDsz", "seed", "sEds", "plHS")
+	compactschool <- c("psxS", "psyS", "pszS", "utmS", "ut9S", "aspS", "thtS", "phiS", "szxS", "szyS", "szzS", "rtxS", "rtyS", "rtzS", "scls", "SDxf", "SDyf", "SDzf", "sEdx", "sEdy", "sEdz", "shpS", "rhoS", "nbfS", "volS","volE", "MEsz", "SDsz", "PDsz", "seed", "sEds", "plHS")
 	
 	# The dynamic variable names of the school:
-	#dynschoolnames = c("psxf", "psyf", "pszf", "rtxf", "rtyf", "rtzf", "vlxf", "vlyf", "vlzf", "size", "Sctr", "Spar", "Sobj", "Sang")
-	dynschoolnames=          c("psxf", "psyf", "pszf", "rtxf", "rtyf", "rtzf", "vlxf", "vlyf", "vlzf", "size")
-	dynschoolnames_echoIBM = c(dynschoolnames, "transducerposL", "lenl", "etaC", "etar4", "etaomega", "sgbs", "fish")
+	#dynschoolnames <- c("psxf", "psyf", "pszf", "rtxf", "rtyf", "rtzf", "vlxf", "vlyf", "vlzf", "size", "Sctr", "Spar", "Sobj", "Sang")
+	dynschoolnames         <- c("psxf", "psyf", "pszf", "rtxf", "rtyf", "rtzf", "vlxf", "vlyf", "vlzf", "size", "scls")
+	dynschoolnames_echoIBM <- c(dynschoolnames, "transducerposL", "lenl", "etaC", "etar4", "etaomega", "sgbs", "fish")
 	
 	# The static variable names of the school:
-	staticschoolnames = c("indl", "acca", "size", "lenl", "mass", "tilt", "epsl", "gamw", "gaml", "obln", "zeta", "pbpf", "ssil", "grff", "graf", "gref", "grsf", "grif", "dbpf", "ebpf", "ssif", "sgbs", "epss", "spow")
+	staticschoolnames <- c("indl", "acca", "size", "lenl", "mass", "tilt", "epsl", "gamw", "gaml", "obln", "zeta", "pbpf", "ssil", "grff", "graf", "gref", "grsf", "grif", "dbpf", "ebpf", "ssif", "sgbs", "epss", "spow")
 	
-	specialBemasnames =  unique(c("beams", "cali", "calf", "rad1", "rad2", "bwt1", "bwt2", "pbp1", "gra1", "gre1", "grs1", "gri1", "dbp1", "ebp1", "pbp2", "gra2", "gre2", "grs2", "gri2", "dbp2", "ebp2", "nrns", "bgns", "hini", "hins"))
-	beamsnamesGeneral = unique(c("esnm", "asps", "numb", "indi", "freq", "absr", "sint", "rres", "plsl", "psze", "lenb", "dira", "dire", "dirx", "diry", "dirz", "bwtl", "bwtt", "eqba", "sacr", "tpow", "gain", "bmmd"))
-	relevantbeamsnames = unique(c(beamsnamesGeneral, c("bwtx", "bwty", "bwth", "bwtv", "gai1", "gai2")))
-	beamsnames = unique(c(specialBemasnames, relevantbeamsnames))
-	beamsnames1D=c("esnm", "asps", "numb", "sint", "plsl", "psze", "bmmd")
-	beamsnames2D=c("indi", "freq", "absr", "lenb", "dirx", "diry", "dirz", "dira", "dire", "bwtl", "bwtt", "bwth", "bwtv", "bwtx", "bwty", "eqba", "sacr", "tpow", "gain", "gai1", "gai2")
+	specialBemasnames  <- unique(c("beams", "cali", "calf", "rad1", "rad2", "bwt1", "bwt2", "pbp1", "gra1", "gre1", "grs1", "gri1", "dbp1", "ebp1", "pbp2", "gra2", "gre2", "grs2", "gri2", "dbp2", "ebp2"))
+	beamsnamesGeneral  <- unique(c("esnm", "asps", "numb", "indi", "freq", "absr", "sint", "rres", "plsl", "psze", "lenb", "dira", "dire", "dirx", "diry", "dirz", "bwtl", "bwtt", "eqba", "sacr", "tpow", "gain", "bmmd"))
+	relevantbeamsnames <- unique(c(beamsnamesGeneral, c("bwtx", "bwty", "bwth", "bwtv", "gai1", "gai2")))
+	beamsnames         <- unique(c(specialBemasnames, relevantbeamsnames))
+	beamsnames1D       <- c("esnm", "asps", "numb", "sint", "rres", "plsl", "psze", "bmmd", "rofs", "sofs")
+	beamsnames2D       <- c("indi", "freq", "absr", "lenb", "dirx", "diry", "dirz", "dira", "dire", "bwtl", "bwtt", "bwth", "bwtv", "bwtx", "bwty", "eqba", "sacr", "tpow", "gain", "gai1", "gai2", "Cgai", "Csac", "Ctcr", "Ccal")
 			
 	# The variable names of the ctd-data:
-	ctdnames = c("ctd", "lonc", "latc", "pszc", "ihpr", "slty", "temp", "cond", "flur", "oxvt", "isps", "rho0", "gacc", "hpr0", "asps")
-	relevantctdnames = c("rho0", "gacc", "hpr0", "temp", "slty", "ihpr", "pszc", "asps")
-	requiredctdnames = c("hpr0", "temp")
+	ctdnames <- c("ctd", "lonc", "latc", "pszc", "ihpr", "slty", "temp", "cond", "flur", "oxvt", "isps", "rho0", "gacc", "hpr0", "asps")
+	relevantctdnames <- c("rho0", "gacc", "hpr0", "temp", "slty", "ihpr", "pszc", "asps")
+	requiredctdnames <- c("hpr0", "temp")
 	# The variable names of relevant periodic noise parameters:
-	relevantpdnsnames = c("acfq", "badb", "pns1", "pns2", "harm", "bgns")
+	relevantpdnsnames <- c("acfq", "badb", "pns1", "pns2", "harm", "bgns")
 	# The variable names of the segmentation data:
-	segmentationdatanames = c("pr0s", "psis", "sgs0", "sgsc", "sgsE", "sgsi", "sgsI", "sgbt", "sgbE")
-	allsegmentationdatanames = c("sgsc", "Xtha", "Xtvl", "Xtbr", "Xtbb", "Xtbt", "Xtbs", "XtTR", "XtTB", "XtTT", "XtTS", "Xsbr", "XSBR", "Xvvl", "Xvha", "Xmsv", "XmSv", "Xasv", "XaSv", "Xxsv","XxSv", "Xqsv", "XqSv", "Xpsv", "XpSv", "Xvsv", "XvSv", "Xvsa", "XvSa", "Xcmx", "Xcmy", "Xcmz", "Xhra", "Xcex", "Xcey", "Xcez", "nlmp", "Xebt", "XeBT", "anis", "anio", "mdf1", "mdf3", "dBan", "dBb1", "dBb2", "dBb3", "dBb4", "dBbs", "smty", "sfnr", "Xcsz", "Xsb1", "Xsbg")
-	segmentationnames = sort(unique(c(segmentationdatanames, allsegmentationdatanames, timenames)))
-	voxelsnames = c("psxx", "psyx", "pszx", "volx", "harx")
+	segmentationdatanames <- c("pr0s", "psis", "sgs0", "sgsc", "sgsE", "sgsi", "sgsI", "sgbt", "sgbE")
+	allsegmentationdatanames <- c("sgsc", "Xtha", "Xtvl", "Xtbr", "Xtbb", "Xtbt", "Xtbs", "XtTR", "XtTB", "XtTT", "XtTS", "Xsbr", "XSBR", "Xvvl", "Xvha", "Xmsv", "XmSv", "Xasv", "XaSv", "Xxsv","XxSv", "Xqsv", "XqSv", "Xpsv", "XpSv", "Xvsv", "XvSv", "Xvsa", "XvSa", "Xcmx", "Xcmy", "Xcmz", "Xhra", "Xcex", "Xcey", "Xcez", "nlmp", "Xebt", "XeBT", "anis", "anio", "mdf1", "mdf3", "dBan", "dBb1", "dBb2", "dBb3", "dBb4", "dBbs", "smty", "sfnr", "Xcsz", "Xsb1", "Xsbg")
+	segmentationnames <- sort(unique(c(segmentationdatanames, allsegmentationdatanames, timenames)))
+	voxelsnames <- c("psxx", "psyx", "pszx", "volx", "harx")
 	# Noise variables
-	bgnsnames = c("bgns", "badb", "pns1", "pns2", "pns3", "harm", "rspd", "rsdM", "bgnM", "bgn0", "bg0M", "pn1M", "pn2M", "pn3M", "pn3I", "pn30", "harM", "hM12", "DPrf", "mDrf", "acfq", "LOWP", "BEGP", "UPPP", "fnvb", "fnvp", "fnvt", "ntry", "NTRY", "FTth", "prex", "pn2I", "esnm", "utim")
-	nrnsnames = c("nrns", "nrn0", "snrn", "snr0", "thrn", "thrs", "zers", "utim")
-	nrnpnames = c("nrnp", "nr0p", "snrp", "sn0p", "thrp", "thps", "zerp", "utmp")
-	nrnanames = c("nrna", "nr0a", "snra", "sn0a", "thra", "thas", "zera", "utma")
-	hinsnames = c("hins", "hini", "HINS")
-	requirednoisenames = c("bgns", "nrnp")
-	requiredcorrnames = c("crb1", "olpb")
+	bgnsnames <- c("bgns", "badb", "pns1", "pns2", "pns3", "harm", "rspd", "rsdM", "bgnM", "bgn0", "bg0M", "pn1M", "pn2M", "pn3M", "pn3I", "pn30", "harM", "hM12", "DPrf", "mDrf", "acfq", "LOWP", "BEGP", "UPPP", "fnvb", "fnvp", "fnvt", "ntry", "NTRY", "FTth", "prex", "pn2I")
+	nrnsnames <- c("nrns", "nrn0", "snrn", "snr0", "thrn", "thrs", "zers")
+	nrnpnames <- c("nrnp", "nr0p", "snrp", "sn0p", "thrp", "thps", "zerp", "utmp")
+	nrnanames <- c("nrna", "nr0a", "snra", "sn0a", "thra", "thas", "zera", "utma")
+	hinsnames <- c("hins", "hini", "HINS")
+	requirednoisenames <- c("bgns", "nrnp")
+	requiredcorrnames <- c("crb1", "olpb")
 	# Variables for functions:
-	echoIBM.generate_oneschool_labl = c("psxf","psyf","pszf","vlxf","vlyf","vlzf","rtzf","rtxf","size","rhoS","nbfS")
-	applotoutput = c("tvbs", "tvol", "aniS", "psxS", "psyS", "pszS", "nseg", "sgmt", "psxs", "psys", "pszs", "vbss", "vols", "dsts", "anio", "psxo", "psyo", "pszo", "szxo", "szyo", "szzo", "ango", "typo", "psxr", "psyr", "pszr")
+	echoIBM.generate_oneschool_labl <- c("psxf", "psyf", "pszf", "vlxf", "vlyf", "vlzf", "rtzf", "rtxf", "scls", "size", "rhoS", "nbfS")
+	#echoIBM.generate_oneschool_labl <- c("psxf", "psyf", "pszf", "vlxf", "vlyf", "vlzf", "rtzf", "rtxf", "size")
+	echoIBM_dynVars <- setdiff(echoIBM.generate_oneschool_labl, c("scls", "rhoS", "nbfS"))
+	applotoutput <- c("tvbs", "tvol", "aniS", "psxS", "psyS", "pszS", "nseg", "sgmt", "psxs", "psys", "pszs", "vbss", "vols", "dsts", "anio", "psxo", "psyo", "pszo", "szxo", "szyo", "szzo", "ango", "typo", "psxr", "psyr", "pszr")
 	
 	
-	EKRaw2TSD_beamsnames = c(
+	EKRaw2TSD_beamsnames <- c(
 		"esnm", # 1  -  1 value per ping
 		"indt", # 2  -  1 value per ping
 		"mtim", # 3  -  1 value per ping
@@ -139,12 +141,12 @@ labl.TSD <- function(var=NULL, adds=NULL, list.out=TRUE){
 		"Cgai", # 31  -  numb values per ping
 		"Csac", # 32  -  numb values per ping
 		"Ctcr", # 33  -  numb values per ping
-		"Ccal", # 10  -  1 value per ping
+		"Ccal", # 10  -  numb value per ping
 		"rofs", # 10  -  1 value per ping
 		"sofs", # 10  -  1 value per ping
 		"nmtc") # 34  -  1 value per ping
 	
-	EKRaw2TSD_vesselnames = c(
+	EKRaw2TSD_vesselnames <- c(
 		"indt", # 1  -  1 value per ping
 		"mtim", # 2  -  1 value per ping
 		"pszv", # 3  -  1 value per ping
@@ -158,7 +160,7 @@ labl.TSD <- function(var=NULL, adds=NULL, list.out=TRUE){
 		"terr", # 10  -  1 value per ping
 		"nmtc") # 11 - 1 value per ping
 
-	EKRaw2TSD_pingsnames = c(
+	EKRaw2TSD_pingsnames <- c(
 		#"indt", # 1  -  1 value per ping
 		"mtim", # 2  -  1 value per ping
 		"vbsc", # 3  -  max(lenb) * numb values per ping
@@ -166,7 +168,7 @@ labl.TSD <- function(var=NULL, adds=NULL, list.out=TRUE){
 		"angt", # 10  -  1 value per ping
 		"nmtc") # 5  -  max(lenb) * numb values per ping
 
-	EKRaw2TSD_ctdnames = c(
+	EKRaw2TSD_ctdnames <- c(
 		"mtim", # 1  -  1 value per raw time step
 		"lonc", # 2  -  1 value per raw time step
 		"latc", # 3  -  1 value per raw time step
@@ -181,7 +183,7 @@ labl.TSD <- function(var=NULL, adds=NULL, list.out=TRUE){
 		"asps") # 12  -  #depths value per raw time step
 		
 		
-	EKRaw2TSD_rawvesselnames = c(
+	EKRaw2TSD_rawvesselnames <- c(
 		"imtm", # 1  -  1 value per raw time step
 		"iltv", # 1  -  1 value per raw time step
 		"ilnv", # 1  -  1 value per raw time step
@@ -192,7 +194,7 @@ labl.TSD <- function(var=NULL, adds=NULL, list.out=TRUE){
 
 
 	# Gather the names in a list having the apropriate names:
-	varnames=list(
+	varnames<-list(
 		a = acousticnames, 
 		ds = dynschoolnames, 
 		dse = dynschoolnames_echoIBM, 
@@ -218,9 +220,11 @@ labl.TSD <- function(var=NULL, adds=NULL, list.out=TRUE){
 		nrnp = nrnpnames, 
 		nrna = nrnanames, 
 		hins = hinsnames, 
+		noise = c(bgnsnames, nrnsnames, nrnpnames, nrnanames, hinsnames),
 		reqnoise = requirednoisenames, 
 		reqcorr = requiredcorrnames, 
 		echoibm.generate_oneschool_labl = echoIBM.generate_oneschool_labl,
+		echoibm_dynvars = echoIBM_dynVars, 
 		applotoutput = applotoutput,
 		ekraw2tsd_b = EKRaw2TSD_beamsnames,
 		ekraw2tsd_v = EKRaw2TSD_vesselnames,

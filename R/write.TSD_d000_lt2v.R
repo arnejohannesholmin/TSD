@@ -49,18 +49,23 @@ write.TSD_d000_lt2v<-function(d000l, numt){
 	else if(length(d000l$dim)==0){
 		return(double(numt))
 		}
-	ndims=lapply(d000l$dim, function(y) if(is.list(y)) sapply(y, length) else length(y))
-	narrays=unlist(lapply(ndims, function(y) length(y[sum(y)!=0])))
-	out=NULL
-	for(i in 1:numt){
-		if(narrays[i]==0){
-			out=c(out, 0)
-			}
-		else{
-			out=c(out, c(unlist(narrays[i])), c(unlist(ndims[i])), c(unlist(d000l$var[i])), c(unlist(d000l$dim[i])))
-			}
-		}
-	out
+	ndims <- lapply(d000l$dim, function(y) if(is.list(y)) sapply(y, length) else length(y))
+	narrays <- unlist(lapply(ndims, function(y) length(y[sum(y)!=0])))
+	
+	# Return a list of the following data combined by 'c' at each time step: (1) narrays: Number of arrays with dimension, (2) ndims: Number of dimensions of each variable, (3) d000l$var: The indices of the variables, (4) lapply(d000l$dim, unlist): The dimensions unlisted:
+	Map(c, narrays, ndims, d000l$var, lapply(d000l$dim, unlist))
+	#
+	#
+	#out <- NULL
+	#for(i in 1:numt){
+	#	if(narrays[i]==0){
+	#		out <- c(out, 0)
+	#		}
+	#	else{
+	#		out <- c(out, c(unlist(narrays[i])), c(unlist(ndims[i])), c(unlist(d000l$var[i])), c(unlist(d000l$dim[i])))
+	#		}
+	#	}
+	#out
 	##################################################
 	##################################################
 	}

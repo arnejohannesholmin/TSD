@@ -2,20 +2,21 @@
 #*********************************************
 #' Merges either (1) TSD files given by 'x', or (2) four character named TSD variables in the list 'x', as returned when reading mutiple TSD files. List elements of identical names are collapsed.
 #'
-#' @param x  is a list of TSD-data, or a directory or vector of TSD-files to be merged, in which case a new directory is created with the merged data.
-#' @param dir  is the directory in which to put the merged file(s).
-#' @param indt  is used then merging TSD-data in the list 'x', causing values for duplicated time steps to be discarded (the variable 'indt' must be present, one for each file/group of data).
-#' @param reserve  is FALSE if time steps should not be reserved, requiring that the lengths and dimensions of the variables in the files to merge match exactly.
-#' @param recursive  is used when listing the files to be merged, and if set to TRUE files in subfolders will be included as well.
-#' @param test.TSD  is TRUE to discard files that are not TSD files (could be time consuming).
-#' @param filesize  is the maximum size of the merged files.
-#' @param chunksize  is the maximum size of the chunks of file read at the time.
-#' @param clear_along  is TRUE to clear files that have been merged imediately after merging.
-#' @param drop.out  is TRUE to clear files that have been merged imediately after merging.
-#' @param adds  is TRUE to clear files that have been merged imediately after merging.
-#' @param linked  is a list of file paths of the same length as 'x' (or the file list of 'x'), holding files that should be merged using the same file grouping as used for 'x'.
-#' @param skipLast  is TRUE to discard the last file in the merging, and simply copy is to the merged-directory.
-#' @param ...  are possible inputs to other functions.
+#' @param x				is a list of TSD-data, or a directory or vector of TSD-files to be merged, in which case a new directory is created with the merged data.
+#' @param dir			is the directory in which to put the merged file(s).
+#' @param indt			is used then merging TSD-data in the list 'x', causing values for duplicated time steps to be discarded (the variable 'indt' must be present, one for each file/group of data).
+#' @param reserve		is FALSE if time steps should not be reserved, requiring that the lengths and dimensions of the variables in the files to merge match exactly.
+#' @param recursive		is used when listing the files to be merged, and if set to TRUE files in subfolders will be included as well.
+#' @param test.TSD		is TRUE to discard files that are not TSD files (could be time consuming).
+#' @param filesize		is the maximum size of the merged files.
+#' @param chunksize		is the maximum size of the chunks of file read at the time.
+#' @param clear_along	is TRUE to clear files that have been merged imediately after merging.
+#' @param drop.out		is TRUE to clear files that have been merged imediately after merging.
+#' @param adds			is TRUE to clear files that have been merged imediately after merging.
+#' @param linked		is a list of file paths of the same length as 'x' (or the file list of 'x'), holding files that should be merged using the same file grouping as used for 'x'.
+#' @param skipLast		is TRUE to discard the last file in the merging, and simply copy it to the merged-directory.
+#' @param skipLast		Logical: If FALSE, the progress bar is suppressed.
+#' @param ...  			are possible inputs to other functions.
 #'
 #' @return
 #'
@@ -29,7 +30,7 @@
 #' @export
 #' @rdname merge_TSD
 #'
-merge_TSD<-function(x, dir=NULL, indt=FALSE, reserve=TRUE, recursive=FALSE, test.TSD=FALSE, filesize=3e8, chunksize=3e8, clear_along=FALSE, drop.out=FALSE, adds=NULL, msg=TRUE, linked=list(), skipLast=FALSE, cores=1, keep.lists=FALSE, pad=TRUE, ...){
+merge_TSD<-function(x, dir=NULL, indt=FALSE, reserve=TRUE, recursive=FALSE, test.TSD=FALSE, filesize=3e8, chunksize=3e8, clear_along=FALSE, drop.out=FALSE, adds=NULL, msg=TRUE, linked=list(), skipLast=FALSE, cores=1, keep.lists=FALSE, pad=TRUE, pbar=TRUE, ...){
 	#merge_TSD<-function(x, dir=NULL, indt=FALSE, reserve=TRUE, recursive=FALSE, #test.TSD=FALSE, filesize=3e8, chunksize=1e8, clear_along=FALSE, drop.out=FALSE, adds=NULL, fileGroups=NULL, numt=NULL, ...){
 	
 	############### LOG: ###############
@@ -87,6 +88,7 @@ merge_TSD<-function(x, dir=NULL, indt=FALSE, reserve=TRUE, recursive=FALSE, test
 			if(clear_along){
 				unlink(thesefiles)
 			}
+			filenames_out <- inputMergeFile
 			# Print all dots of the current file group:
 			#msgfun(cbind(i,seq_along(fileGroups[[i]])))
 		}
@@ -103,7 +105,8 @@ merge_TSD<-function(x, dir=NULL, indt=FALSE, reserve=TRUE, recursive=FALSE, test
 				filenames_out[[1]][mergeFileInd + seq(0, length(outputMergeFile)-1)] = outputMergeFile
 				if(length(linked)){
 					for(l in seq_along(linked)){
-						inputMergeFile <- file.path(dir, basename(files[fileGroups[[i]][[1]]][1]))
+						# inputMergeFile <- file.path(dir, basename(files[fileGroups[[i]][[1]]][1])) # ERROR, CORRECTED TO linked[[l]] BELOW ON 2018-03-08:
+						inputMergeFile <- file.path(dir, basename(linked[[l]][fileGroups[[i]][[1]]][1]))
 						outputMergeFile = merge_one(files=linked[[l]], inputMergeFile=inputMergeFile, dir=dir[1], fileGroups=fileGroups, i=i, j=j, indt=indt, drop.out=drop.out, adds=adds, reserve=reserve, clear_along=clear_along, skipLast=skipLast, numt=numt)
 						filenames_out[[1+l]][mergeFileInd + seq(0, length(outputMergeFile)-1)] = outputMergeFile
 					}
@@ -112,7 +115,12 @@ merge_TSD<-function(x, dir=NULL, indt=FALSE, reserve=TRUE, recursive=FALSE, test
 		}
 		filenames_out
 	}
-		
+	
+	if(!pbar){
+		pbo <- pboptions(type = "none")
+		on.exit(pboptions(pbo))
+	}
+	
 	if(is.list(x)){
 		# Discard variable info:
 		x = x[names(x)!= "info"]
@@ -301,7 +309,8 @@ merge_TSD<-function(x, dir=NULL, indt=FALSE, reserve=TRUE, recursive=FALSE, test
 		}
 		# Progress bar parallel processing (if cores>1):	
 		cat("Merging TSD files:\n")
-		out <- pblapply(seq_along(fileGroups), mergeOneFileGroup, dir=dir, fileGroups=fileGroups, files=x, indt=indt, drop.out=drop.out, adds=adds, reserve=reserve, clear_along=clear_along, skipLast=skipLast, linked=linked, filenames_out=filenames_out, numt=numt, cl=cores)	
+		#out <- pblapply(seq_along(fileGroups), mergeOneFileGroup, dir=dir, fileGroups=fileGroups, files=x, indt=indt, drop.out=drop.out, adds=adds, reserve=reserve, clear_along=clear_along, skipLast=skipLast, linked=linked, filenames_out=filenames_out, numt=numt, cl=cores)	
+		out <- papply(seq_along(fileGroups), mergeOneFileGroup, dir=dir, fileGroups=fileGroups, files=x, indt=indt, drop.out=drop.out, adds=adds, reserve=reserve, clear_along=clear_along, skipLast=skipLast, linked=linked, filenames_out=filenames_out, numt=numt, cores=cores)	
 		
 		
 		
@@ -358,14 +367,6 @@ merge_TSD<-function(x, dir=NULL, indt=FALSE, reserve=TRUE, recursive=FALSE, test
 		#		}
 		#	}
 			
-			
-			
-		
-				
-				
-				
-				
-		
 		cat("\n")
 		
 		out <- do.call(rbind, lapply(out, as.data.frame, stringsAsFactors=FALSE))

@@ -14,7 +14,7 @@
 #' @param drop.out  is TRUE to drop empty dimensions of arrays and unlist lists of length 1.
 #' @param info  is TRUE if the variable 'info' returned from info.TSD() should be added to the output (applied in read.TSD()).
 #' @param silent  is FALSE to print progress bar. If the 'silent' should be set to FALSE in general, use options(verbose=TRUE).
-#' @param raw  is TRUE to read files quicker by reading the information as raw, and converting to the appropriate data types aferwards, which olny applies if the number of time steps exceed 20 and the number of values of the file does not exceed 'raw'.
+#' @param use.raw  is TRUE to read files quicker by reading the information as raw, and converting to the appropriate data types aferwards, which olny applies if the number of time steps exceed 20 and the number of values of the file does not exceed 'use.raw'.
 #'
 #' @return
 #'
@@ -24,7 +24,7 @@
 #' @export
 #' @rdname read.TSD
 #'
-read.TSD <- function(con, t=1, var="all", dimension=TRUE, header=FALSE, max_var=1e10, indt=FALSE, d000.out=FALSE, keep.all=FALSE, drop.out=TRUE, info=FALSE, silent=!getOption("verbose"), raw=1e3){
+read.TSD <- function(con, t=1, var="all", dimension=TRUE, header=FALSE, max_var=1e10, indt=FALSE, d000.out=FALSE, keep.all=FALSE, drop.out=TRUE, info=FALSE, silent=!getOption("verbose"), use.raw=1e3){
 	
 	############ AUTHOR(S): ############
 	# Arne Johannes Holmin
@@ -56,8 +56,8 @@ read.TSD <- function(con, t=1, var="all", dimension=TRUE, header=FALSE, max_var=
 	# Update: 2014-09-24 - Added the option of seting the header on input, to save time when reading files with large headers (typically files with a large number of time steps and varying variable lengths).
 	# Update: 2014-09-27 - Changed to fit the new format with numt and r000 in the file header.
 	# Update: 2014-12-12 - Added support for complex variables through the data types "cpxf" and "cpxd".
-	# Update: 2015-05-11 - Significant speed up when all variables are read from a continous sequence of time steps, in which all the data are read in one go using raw, and each variable converted to its given data type and organized in a list.
-	# Last: 2015-05-14 - Added 'raw'.
+	# Update: 2015-05-11 - Significant speed up when all variables are read from a continous sequence of time steps, in which all the data are read in one go using use.raw, and each variable converted to its given data type and organized in a list.
+	# Last: 2015-05-14 - Added 'use.raw'.
 	
 
 	##################################################
@@ -66,39 +66,39 @@ read.TSD <- function(con, t=1, var="all", dimension=TRUE, header=FALSE, max_var=
 	### Connection: ###
 	# Get the name of the file:
 	if("file" %in% is(con)){
-		conname = summary(con)$description
+		conname <- summary(con)$description
 		close(con)
 		}
 	else if(is.character(con)){
-		conname = con
+		conname <- con
 		}
 	else{
 		stop("Invalid connection. Must either be a file object or a character string")
 		}
 	
-	split_char = "\u001F"
+	split_char <- "\u001F"
 	### End of Connection ###
 	
 	### Header: ###
 	# Only the header is read if t=="none" or var=="none" (or none of the elements of 'var are available). 'timeout' is the time variables to return:
 	if(identical(t, "none") || identical(var, "none")){
-		t = 0
-		var = NULL
-		timeout = NULL
+		t <- 0
+		var <- NULL
+		timeout <- NULL
 		}
 	# If only 'indt' is requested, try to read only the first and last value and see if all time points are in sequence:
-	onlyindt = identical("indt",tolower(var))
+	onlyindt <- identical("indt", tolower(var))
 	
 	# If header variable names are given in 'var', store these and add the requested header variables at the end in the case header=FALSE:
-	headernames = c("nvar", "numt", "r000", "labl", "lvar", "dtyp", "numt", "endian")
+	headernames <- c("nvar", "numt", "r000", "labl", "lvar", "dtyp", "numt", "endian")
 	if(!isTRUE(header)){
-		headervar = intersect(var, headernames)
+		headervar <- intersect(var, headernames)
 		}
 	
 	# The relevant file types to be read, using R-terminology, is "int" and "double". The connection between java-terminology and R-terminology is c("byte", "short int", "long int", "float", "double") ~ c("int", "int", "int", "double", "double"):
- 	valid_datatypes = c("character", "int", "int", "int", "double", "double", "double", "double")
- 	valid_dtyp = c("char", "byte", "shrt", "long", "floa", "doub", "cpxf", "cpxd")
- 	datasizes = c(1, 1, 2, 4, 4, 8, 4, 8)
+ 	valid_datatypes <- c("character", "int", "int", "int", "double", "double", "double", "double")
+ 	valid_dtyp <- c("char", "byte", "shrt", "long", "floa", "doub", "cpxf", "cpxd")
+ 	datasizes <- c(1, 1, 2, 4, 4, 8, 4, 8)
 	### End of Header ###
 	
 	
@@ -107,34 +107,34 @@ read.TSD <- function(con, t=1, var="all", dimension=TRUE, header=FALSE, max_var=
 	# The files are structured in a specific way. (1) a four byte float holding the number of variables. (2) a four byte long holding the number of time steps of the file. (3) a four byte long holding the number of rows of the 'lvar' information. (4) the lvar information, given as a long-matrix of one row for each time step or only one row if all variables have constant number of elements for each time step. (5) a vector of four character labels of the variables. (6) a vector of four character data dype information strings:
 	
 	# Test for the TSD format:
-	if(!is.TSD(conname,recursive=FALSE,accept.dir=FALSE)){
+	if(!is.TSD(conname, recursive=FALSE, accept.dir=FALSE)){
 		warning(paste("The path\"", conname, "\"is not a TSD file", sep=""))
 		return(list())
 		}
-	con = file(conname, "rb")
+	con <- file(conname, "rb")
 	seek(con, 4)
 	
 	# The header may be given in the input:
 	if(is.list(header) && all(c("nvar", "numt", "r000", "labl", "lvar", "dtyp", "endian", "dtyp") %in% names(header))){
-		nvar = header$nvar
-		numt = header$numt
-		r000 = header$r000
-		lvar = header$lvar
-		labl = header$labl
-		dtyp = header$dtyp
-		endian = header$endian
+		nvar <- header$nvar
+		numt <- header$numt
+		r000 <- header$r000
+		lvar <- header$lvar
+		labl <- header$labl
+		dtyp <- header$dtyp
+		endian <- header$endian
 		}
 	else{
 		# 1: Number of variables:
-		nvar = read.TSD_isnvar(con, n=1L, max_var=max_var)
+		nvar <- read.TSD_isnvar(con, n=1L, max_var=max_var)
 		if(length(nvar$x)==0){
 			return(list())
 			}
-		endian = nvar$endian
-		nvar = nvar$x
+		endian <- nvar$endian
+		nvar <- nvar$x
 		
 		# Number of time steps:
-		numt = readBin(con, what=integer(), n=1, size=4, signed=TRUE, endian=endian)
+		numt <- readBin(con, what=integer(), n=1, size=4, signed=TRUE, endian=endian)
 		if(numt!=round(numt)){
 			warnings("The bytes 5 to 8 are supposed to be a long giving the number of time steps contained in the file, but does not give a whole number")
 			}
@@ -143,7 +143,7 @@ read.TSD <- function(con, t=1, var="all", dimension=TRUE, header=FALSE, max_var=
 			}
 			
 		# Number of rows of 'lvar':
-		r000 = readBin(con, what=integer(), n=1, size=4, signed=TRUE, endian=endian)
+		r000 <- readBin(con, what=integer(), n=1, size=4, signed=TRUE, endian=endian)
 		if(r000!=round(r000)){
 			warnings("The bytes 9 to 12 are supposed to be a long giving the number of time steps stored in the header variable 'lvar', but does not give a whole number")
 			}
@@ -152,191 +152,193 @@ read.TSD <- function(con, t=1, var="all", dimension=TRUE, header=FALSE, max_var=
 			}
 			
 		# 2: Lengths of variables:
-		lvar = readBin(con, what=integer(), n=r000*nvar, size=4, signed=TRUE, endian=endian)
-		lvar = matrix(lvar, nrow=r000, byrow=TRUE)
-		lvar_out = lvar
+		lvar <- readBin(con, what=integer(), n=r000*nvar, size=4, signed=TRUE, endian=endian)
+		lvar <- matrix(lvar, nrow=r000, byrow=TRUE)
+		lvar_out <- lvar
+		# Repeat the lvar if multiple time steps are given in the file, and the lvar has only one row (identical variable length for all time steps):
 		if(r000<2 && numt>1){
-			suppressWarnings(lvar<-matrix(lvar, nrow=numt, ncol=nvar, byrow=TRUE))
+			suppressWarnings(lvar <- matrix(lvar, nrow=numt, ncol=nvar, byrow=TRUE))
 			}
 				
 		# 3: Names of variables:
-		labl = readChar(con=con, nchars=rep(4, nvar), useBytes=TRUE)
+		labl <- readChar(con=con, nchars=rep(4, nvar), useBytes=TRUE)
 		
 		# 4: Variable types:
-		dtyp = readChar(con=con, nchars=rep(4, nvar), useBytes=TRUE)
+		dtyp <- readChar(con=con, nchars=rep(4, nvar), useBytes=TRUE)
 	}
 	
 	
 	# Incices to complex variables, which are given as two vectors, one real and one imaginary, and are trancformed to complex here:
-	arecomplex = substr(dtyp,1,3)=="cpx"
+	arecomplex <- substr(dtyp, 1, 3)=="cpx"
 	
 	# 5: Treatment of 'lvar' and creating the matrix 'index' specifying the positions to read from:
 	# Identifying the sizes and the data types to be used when reading the data using readBin(). In R c("byte", "shrt", "long", "floa", "doub") corresponds to c("int", "int", "int", "double", "double") with size c(1, 2, 4, 4, 8) bytes as specified in readBin:
-	dtyp_present = match(dtyp, valid_dtyp)
+	dtyp_present <- match(dtyp, valid_dtyp)
 	
 	# 'lvar_char' is the same as 'lvar' only for character variables the lengths are set to 1. To be used when inserting to the output:
-	lvar_char = lvar
+	lvar_char <- lvar
 	
 	# Set the length of all character strings to 1:
-	isCharFinite = lvar_char[, dtyp=="char"]
-	isCharFinite[isCharFinite>0] = 1
-	lvar_char[, dtyp=="char"] = isCharFinite
+	isCharFinite <- lvar_char[, dtyp=="char"]
+	isCharFinite[isCharFinite>0] <- 1
+	lvar_char[, dtyp=="char"] <- isCharFinite
 	# The header length:
-	headersize = 4*4 + 4*r000*nvar + 4*length(labl) + 4*length(dtyp)
-	# Create the indices used when reading the data:
-	index = headersize + c(0, cumsum(c(aperm(lvar)*datasizes[dtyp_present]))[-(length(lvar))])
-	index = matrix(index, nrow=max(r000,numt), ncol=nvar, byrow=TRUE)
+	headersize <- 4*4 + 4*r000*nvar + 4*length(labl) + 4*length(dtyp)
+	# Create the indices used when reading the data. These are the cummulative number of bytes for each variable of each time step:
+	cumBytes <- cumsum(c(t(lvar)) * datasizes[dtyp_present])
+	index <- headersize + c(0, cumBytes[-(length(lvar))])
+	index <- matrix(index, nrow=max(r000,numt), ncol=nvar, byrow=TRUE)
 	
 	# If 'indt' is given as input, and a variable named 'indt' is present in the data, 't' is cross referenced to these time steps indexes so that if indt=1, 11, 21, and t=1:12, the first two time steps are read:
 	if(!identical(t, 0) && !identical(var, 0) && indt && "indt" %in% labl){
 		# 'indtat' is the indices of the 'indt' variables:
-		indtat = which("indt"==labl)
+		indtat <- which("indt"==labl)
 		# When 'indt' is requested, a file of many pings may cause reading 'indt' to be a slow process. Thus a test is made for continnuity of 'indt', in which case only the first and last value is read, and the sequence between these is returned as 'indt':
-		indt_con = read.TSD_getindtFirstLast(labl, con, index, dtyp_present, valid_datatypes, datasizes, endian)
+		indt_con <- read.TSD_getindtFirstLast(labl, con, index, dtyp_present, valid_datatypes, datasizes, endian)
 		# Otherwise, read the indt variable convensionally:
-		indt_con = read.TSD_readAllTimeStepsOfOneVariable(nrow(index), lvar=lvar, var=indtat, con=con, index=index, dtyp=dtyp, valid_datatypes=valid_datatypes, dtyp_present=dtyp_present, datasizes=datasizes, endian=endian, arecomplex=arecomplex)
+		indt_con <- read.TSD_readAllTimeStepsOfOneVariable(nrow(index), lvar=lvar, var=indtat, con=con, index=index, dtyp=dtyp, valid_datatypes=valid_datatypes, dtyp_present=dtyp_present, datasizes=datasizes, endian=endian, arecomplex=arecomplex)
  		
 		# Treat 't' given 'indt_con':
  		if(identical(t, "all")){
-			t = seq_along(indt_con)
+			t <- seq_along(indt_con)
 			}
 	 	else if(identical(t, "last") || identical(t, "end")){
-			t = length(indt_con)
+			t <- length(indt_con)
 			}
 	 	else if(identical(t, "firstlast") || identical(t, "range")){
-			t = unique(c(1, length(indt_con)))
+			t <- unique(c(1, length(indt_con)))
 			}
 		else{
-			t = match(as.numeric(t), indt_con)
+			t <- match(as.numeric(t), indt_con)
 			}
  		}
 	else{
 		# Treat 't' given 'numt':
 		if(identical(t, "all")){
-			t = seq_len(numt)
+			t <- seq_len(numt)
 			}
 	 	else if(identical(t, "last") || identical(t, "end")){
-			t = numt
+			t <- numt
 			}
 		else if(identical(t, "firstlast") || identical(t, "range")){
-			t = unique(c(1, numt))
+			t <- unique(c(1, numt))
 			}
 		else{
-			t = match(as.numeric(t), seq_len(numt))
+			t <- match(as.numeric(t), seq_len(numt))
 			}
 		}
 	
 	if(!keep.all){
-		t = t[!is.na(t)]
+		t <- t[!is.na(t)]
 		}
-	validt = !is.na(t)
-	cleant = t[validt]
+	validt <- !is.na(t)
+	cleant <- t[validt]
 				
 	# Define the sequence along 't':
-	tseq = seq_along(t)
+	tseq <- seq_along(t)
 	
 	# Set 'var' to NULL if 't' is empty:
 	if(length(t)==0){
- 		var = NULL
+ 		var <- NULL
  		}
  	
 	# If var=="all", all variables are read (default):
 	if(identical(var, "all")){
-		var = labl
+		var <- labl
 		}
 						
 	# Convert to indices. Only the variables specified in 'var' are read:
-	validtimevar = c("mtim", "utim", "utmp", "utma", "ctim", "ftim")
-	timeout = intersect(var, validtimevar)
+	validtimevar <- c("mtim", "utim", "utmp", "utma", "ctim", "ftim")
+	timeout <- intersect(var, validtimevar)
 	if(is.character(var)){
 		# If "time" is in 'var', all available time variables are read:
 		# 'timeout' is a vector of the time variables that are to be returned:
-		timeout = intersect(validtimevar, var)
+		timeout <- intersect(validtimevar, var)
 		if("time" %in% var){
-			timeout = c(validtimevar, "indt")
-			var = unique(c(var, "numt", "indt", validtimevar))
+			timeout <- c(validtimevar, "indt")
+			var <- unique(c(var, "numt", "indt", validtimevar))
 			}
 		# If any of "mtim", "utim" and "ftim" are requested, all time variables are read, but only the required returned:
 		if(any(c("mtim", "utim", "ftim") %in% var)){
-			var = unique(c(var, "numt", "indt", "mtim", "utim", "ctim", "ftim"))
+			var <- unique(c(var, "numt", "indt", "mtim", "utim", "ctim", "ftim"))
 			}
 		# Add dimension data to 'var' if present:
 		if(length(var)>0 && "d000" %in% labl){
-			var = unique(c(var, "d000"))
+			var <- unique(c(var, "d000"))
 			}
-		varChar = var
-		var = which(labl %in% var)
+		varChar <- var
+		var <- which(labl %in% var)
 		}
 			
 	# Numerically given variables are cropped to the sequence of variables
-	var = var[var>=1 & var<=nvar]
+	var <- var[var>=1 & var<=nvar]
 	# Character variables:
-	charvar = which(dtyp[var]=="char")
+	charvar <- which(dtyp[var]=="char")
 	# Sequence of length equal to the number of variables:
-	varseq = seq_along(var)
+	varseq <- seq_along(var)
 	
 	# Define the output as a list:
 	if(length(t)>0){
-		out = rep(list(vector("list", length(t))), length(var))
+		out <- rep(list(vector("list", length(t))), length(var))
 		}
 	else{
-		out = list()
+		out <- list()
 		}
 		
 	
 	# 6: Variables:
 	# If 'indt' is requested, a file of many pings may cause reading 'indt' to be a slow process. Thus a test is made for continnuity of 'indt', in which case only the first and last value is read, and the sequence between these is retunred as 'indt':
 	if(onlyindt && numt>0){
-		indtat = which("indt"==labl[var])
+		indtat <- which("indt"==labl[var])
 		# If indt==TRUE, 't' has already been matched to 'indt' of the file:
 		if(indt){
-			out[[indtat]][cleant] = as.list(cleant)
-			varseq = seq_along(var)[-indtat]
+			out[[indtat]][cleant] <- as.list(cleant)
+			varseq <- seq_along(var)[-indtat]
 			}
 		else{	
 			# If 'indt' is requested, a file of many pings may cause reading 'indt' to be a slow process. Thus a test is made for continnuity of 'indt', in which case only the first and last value is read, and the sequence between these is returned as 'indt':
-			indt_con = read.TSD_getindtFirstLast(labl, con, index, dtyp_present, valid_datatypes, datasizes, endian)
+			indt_con <- read.TSD_getindtFirstLast(labl, con, index, dtyp_present, valid_datatypes, datasizes, endian)
 			# Otherwise, read the indt variable convensionally:
 			if(length(indt_con)==0){
-				indt_con = read.TSD_readAllTimeStepsOfOneVariable(nrow(index), lvar=lvar, var=which("indt"==labl), con=con, index=index, dtyp=dtyp, valid_datatypes=valid_datatypes, dtyp_present=dtyp_present, datasizes=datasizes, endian=endian, arecomplex=arecomplex)
+				indt_con <- read.TSD_readAllTimeStepsOfOneVariable(nrow(index), lvar=lvar, var=which("indt"==labl), con=con, index=index, dtyp=dtyp, valid_datatypes=valid_datatypes, dtyp_present=dtyp_present, datasizes=datasizes, endian=endian, arecomplex=arecomplex)
 				}
 			
  			# Insert to the output:
  			if(length(indt_con)>0){
-				out[[indtat]][validt] = as.list(indt_con[cleant])
-				varseq = seq_along(var)[-indtat]
+				out[[indtat]][validt] <- as.list(indt_con[cleant])
+				varseq <- seq_along(var)[-indtat]
 				}
 			}
 		}
 	
 	# Plot dots for the progress if silent==FALSE:
 	if(!silent){
-		infostring = paste0("Reading time steps of file", basename(conname), ":")
+		infostring <- paste0("Reading time steps of file", basename(conname), ":")
 		cat(infostring, "\n", sep="")
-		totalsteps = length(tseq)
-		stepfact = nchar(infostring)/totalsteps
-		oldvalue = 0
+		totalsteps <- length(tseq)
+		stepfact <- nchar(infostring)/totalsteps
+		oldvalue <- 0
 		}
 	
 	# If all variables are requested for a continuous sequence of time steps, and the number of values per time step is not high, read all the data as raw, and convert to the apropriate variables afterwards:
-	if(is.numeric(raw)){
-		raw = sum(lvar[t[1],])<raw
+	if(is.numeric(use.raw)){
+		use.raw <- sum(lvar[t[1],])<use.raw
 		}
-	mint_raw = 0
+	mint_raw <- 0
 	
 	# Note whether the reading of raw data resulted in a list of time steps or a flat vector of all data for each variable:
 	readRawAndEqualTimeSteps <- logical(length(varseq))
 	# Here we require that all of the following three occur:
-	#	(1) the user has specified 'raw'
+	#	(1) the user has specified 'use.raw'
 	#	(2) the number of requested time steps exceeds mint_raw AND all variables are requested
 	#	(3) either only one time step is requested OR a continnous sequence of time steps is requested:
-	if(raw && (length(tseq)>mint_raw && identical(varseq,var)) && (length(t)==1 || all(diff(t)==1))){
+	if(use.raw && (length(tseq)>mint_raw && identical(varseq,var)) && (length(t)==1 || all(diff(t)==1))){
 		# Seek to the position of the 
-		s = seek(con, index[t[tseq[1]], 1], origin="start")
-		lvarBytes = lvar * rep(datasizes[dtyp_present], each=nrow(lvar))
-		index = index - headersize
-		#index = index - index[t[tseq[1]], 1]
-		sumEachVar = colSums(lvar[t[tseq], ,drop=FALSE])
+		s <- seek(con, index[t[tseq[1]], 1], origin="start")
+		lvarBytes <- lvar * rep(datasizes[dtyp_present], each=nrow(lvar))
+		index <- index - headersize
+		#index <- index - index[t[tseq[1]], 1]
+		sumEachVar <- colSums(lvar[t[tseq], ,drop=FALSE])
 		# Read the requested time steps as raw, reading all variables:
 		raw <- readBin(con, what="raw", n=sum(lvarBytes[t[tseq], ]), endian=endian)
 		
@@ -361,29 +363,29 @@ read.TSD <- function(con, t=1, var="all", dimension=TRUE, header=FALSE, max_var=
 				starts <- rep(index[t[tseq], i], lvarBytes[t[tseq], i])
 				steps <- sequence(lvarBytes[t[tseq], i])
 				thisout <- starts + steps
-				thisout = raw[thisout]
+				thisout <- raw[thisout]
 			}
 			
 			# Convert the raw vector to the apropriate data:
 			if(dtyp[var[i]]=="char"){
-				thisout = readChar(thisout, nchars=lvar[t[tseq],i], useBytes=TRUE)
-				#thisout = strsplit(thisout, "")[[1]]
+				thisout <- readChar(thisout, nchars=lvar[t[tseq],i], useBytes=TRUE)
+				#thisout <- strsplit(thisout, "")[[1]]
 				}
 			else{
-				thisout = readBin(thisout, what=valid_datatypes[dtyp_present][var[i]], n=length(thisout), size=datasizes[dtyp_present][var[i]], endian=endian, signed=TRUE)
+				thisout <- readBin(thisout, what=valid_datatypes[dtyp_present][var[i]], n=length(thisout), size=datasizes[dtyp_present][var[i]], endian=endian, signed=TRUE)
 				}
 			
 			# Split into time steps, but only if there are actually differing lengths of time steps:
 			if(!equalTimeSteps[i] && dtyp[var[i]]!="char"){
 				if(sumEachVar[i]>1e6){
-					l = rbind(c(1,cumsum(lvar[t[tseq], i])[-length(t[tseq])]+1), cumsum(lvar[t[tseq], i]))
-					l = split(l, rep(seq_along(t[tseq]),each=2))
-					thisout = lapply(l, function(x) if(x[2]>=x[1]) thisout[seq.int(x[1],x[2])] else NULL)
+					l <- rbind(c(1,cumsum(lvar[t[tseq], i])[-length(t[tseq])]+1), cumsum(lvar[t[tseq], i]))
+					l <- split(l, rep(seq_along(t[tseq]),each=2))
+					thisout <- lapply(l, function(x) if(x[2]>=x[1]) thisout[seq.int(x[1],x[2])] else NULL)
 					}
 				else{
-					temp = split(thisout, rep(index[t[tseq], i], lvar[t[tseq], i]))
-					thisout = vector("list", length(tseq))
-					thisout[lvar[t[tseq], i]>0] = temp
+					temp <- split(thisout, rep(index[t[tseq], i], lvar[t[tseq], i]))
+					thisout <- vector("list", length(tseq))
+					thisout[lvar[t[tseq], i]>0] <- temp
 				}
 			}
 			else{
@@ -392,19 +394,19 @@ read.TSD <- function(con, t=1, var="all", dimension=TRUE, header=FALSE, max_var=
 			
 			# Paste together stings:
 			if(dtyp[var[i]]=="char"){
-				thisout = lapply(thisout, paste0, collapse="")
+				thisout <- lapply(thisout, paste0, collapse="")
 				}
 			# Remove names on 'thisout':
 			names(thisout) <- NULL
 			# Convert to complex:
 			if(arecomplex[i]){
-				thisout = lapply(thisout, vecRealImaginary2complex)
+				thisout <- lapply(thisout, vecRealImaginary2complex)
 				}
 			if(length(thisout)>0){
-				out[[i]] = thisout
+				out[[i]] <- thisout
 				}
 			else{
-				out[[i]] = thisout
+				out[[i]] <- thisout
 				}
 			}
 		}
@@ -423,31 +425,31 @@ read.TSD <- function(con, t=1, var="all", dimension=TRUE, header=FALSE, max_var=
 		for(p in tseq){
 			# Print a dot if the floor of the new value exceeds the old value in:
 			if(!silent){
-				thisvalue = floor(p*stepfact)
+				thisvalue <- floor(p*stepfact)
 				if(thisvalue > oldvalue){
 					cat(rep(".", thisvalue-oldvalue), sep="")
 					if(p==totalsteps){
 						cat("\n")
 						}
-					oldvalue = thisvalue
+					oldvalue <- thisvalue
 					}
 				}
 			# Run through the requested variables at this time step:
 			for(i in varseq){
 				if(validt[p] && lvar[t[p], var[i]]!=0){
 					if(dtyp[var[i]]=="char"){
-						thisout = readChar(con, lvar[t[p], var[i]], useBytes=TRUE)
+						thisout <- readChar(con, lvar[t[p], var[i]], useBytes=TRUE)
 						}
 					else{
-						thisout = readBin(con, valid_datatypes[dtyp_present][var[i]], n=lvar[t[p], var[i]], size=datasizes[dtyp_present][var[i]], endian=endian, signed=TRUE)
+						thisout <- readBin(con, valid_datatypes[dtyp_present][var[i]], n=lvar[t[p], var[i]], size=datasizes[dtyp_present][var[i]], endian=endian, signed=TRUE)
 						}
 					# Change convert to complex:
 					if(arecomplex[i]){
-						halflength = length(thisout)/2
-						halfind = seq_len(halflength)
-						thisout = complex(real=thisout[halfind], imaginary=thisout[halfind+halflength])
+						halflength <- length(thisout)/2
+						halfind <- seq_len(halflength)
+						thisout <- complex(real=thisout[halfind], imaginary=thisout[halfind+halflength])
 						}
-					out[[i]][[p]] = thisout
+					out[[i]][[p]] <- thisout
 					}
 				}
 			}
@@ -458,32 +460,32 @@ read.TSD <- function(con, t=1, var="all", dimension=TRUE, header=FALSE, max_var=
 		for(p in tseq){
 			# Print a dot if the floor of the new value exceeds the old value in:
 			if(!silent){
-				thisvalue = floor(p*stepfact)
+				thisvalue <- floor(p*stepfact)
 				if(thisvalue > oldvalue){
 					cat(rep(".", thisvalue-oldvalue), sep="")
 					if(p==totalsteps){
 						cat("\n")
 						}
-					oldvalue = thisvalue
+					oldvalue <- thisvalue
 					}
 				}
-			s = seek(con, index[t[p], 1], origin="start")
+			s <- seek(con, index[t[p], 1], origin="start")
 			# Run through the requested variables at this time step:
 			for(i in varseq){
 				if(validt[p] && lvar[t[p], var[i]]!=0){
 					if(dtyp[var[i]]=="char"){
-						thisout = readChar(con, lvar[t[p], var[i]], useBytes=TRUE)
+						thisout <- readChar(con, lvar[t[p], var[i]], useBytes=TRUE)
 						}
 					else{
-						thisout = readBin(con, valid_datatypes[dtyp_present][var[i]], n=lvar[t[p], var[i]], size=datasizes[dtyp_present][var[i]], endian=endian, signed=TRUE)
+						thisout <- readBin(con, valid_datatypes[dtyp_present][var[i]], n=lvar[t[p], var[i]], size=datasizes[dtyp_present][var[i]], endian=endian, signed=TRUE)
 						}
 					# Change convert to complex:
 					if(arecomplex[i]){
-						halflength = length(thisout)/2
-						halfind = seq_len(halflength)
-						thisout = complex(real=thisout[halfind], imaginary=thisout[halfind+halflength])
+						halflength <- length(thisout)/2
+						halfind <- seq_len(halflength)
+						thisout <- complex(real=thisout[halfind], imaginary=thisout[halfind+halflength])
 						}
-					out[[i]][[p]] = thisout
+					out[[i]][[p]] <- thisout
 					}
 				}
 			}
@@ -494,32 +496,32 @@ read.TSD <- function(con, t=1, var="all", dimension=TRUE, header=FALSE, max_var=
 		for(p in tseq){
 			# Print a dot if the floor of the new value exceeds the old value in:
 			if(!silent){
-				thisvalue = floor(p*stepfact)
+				thisvalue <- floor(p*stepfact)
 				if(thisvalue > oldvalue){
 					cat(rep(".", thisvalue-oldvalue), sep="")
 					if(p==totalsteps){
 						cat("\n")
 						}
-					oldvalue = thisvalue
+					oldvalue <- thisvalue
 					}
 				}
 			# Run through the requested variables at this time step:
 			for(i in varseq){
 				if(validt[p] && lvar[t[p], var[i]]!=0){
-					s = seek(con, index[t[p], var[i]], origin="start")
+					s <- seek(con, index[t[p], var[i]], origin="start")
 					if(dtyp[var[i]]=="char"){
-						thisout = readChar(con, lvar[t[p], var[i]], useBytes=TRUE)
+						thisout <- readChar(con, lvar[t[p], var[i]], useBytes=TRUE)
 						}
 					else{
-						thisout = readBin(con, valid_datatypes[dtyp_present][var[i]], n=lvar[t[p], var[i]], size=datasizes[dtyp_present][var[i]], endian=endian, signed=TRUE)
+						thisout <- readBin(con, valid_datatypes[dtyp_present][var[i]], n=lvar[t[p], var[i]], size=datasizes[dtyp_present][var[i]], endian=endian, signed=TRUE)
 						}
 					# Change convert to complex:
 					if(arecomplex[i]){
-						halflength = length(thisout)/2
-						halfind = seq_len(halflength)
-						thisout = complex(real=thisout[halfind], imaginary=thisout[halfind+halflength])
+						halflength <- length(thisout)/2
+						halfind <- seq_len(halflength)
+						thisout <- complex(real=thisout[halfind], imaginary=thisout[halfind+halflength])
 						}
-					out[[i]][[p]] = thisout
+					out[[i]][[p]] <- thisout
 					}
 				}
 			}
@@ -535,40 +537,42 @@ read.TSD <- function(con, t=1, var="all", dimension=TRUE, header=FALSE, max_var=
 	# Preparing the output, if any:
 	if(length(var)>0 && length(t)>0){
 		# Adding the names provided in the file:
-		names(out) = labl[var]
+		names(out) <- labl[var]
 		# Split character strings:
 		if(length(charvar)>0){
-			out[charvar] = lapply(out[charvar], function(xx) lapply(xx, function(x) if(length(x)) strsplit(x, split_char, fixed=TRUE)[[1]]))
+			out[charvar] <- lapply(out[charvar], function(xx) lapply(xx, function(x) if(length(x)) strsplit(x, split_char, fixed=TRUE)[[1]]))
 			}
 		
 		# Adding dimension if dimension==TRUE:
 		if(isTRUE(dimension) || tolower(dimension)=="t"){
 			# If present, dimension information 'd000' is extracted from 'out$d000' and cross referenced against length information 'lvar':
 			if(!is.null(out$d000)){
+				
 				# Store the 'd000' vector:
-				out$d000 = unlist(out$d000[validt], use.names=FALSE)
-				out$d000v = out$d000
+				out$d000 <- unlist(out$d000[validt], use.names=FALSE)
+				out$d000v <- out$d000
 				# Transform the 'd000' vector to a list:
-				out$d000 = read.TSD_d000_v2lv(out$d000, conname)
+				out$d000 <- read.TSD_d000_v2lv(out$d000, conname)
 				# Remove "d000" from 'var':
-				var = var[labl[var]!="d000"]
+				var <- var[labl[var]!="d000"]
 				
 				# If dimension information is given, this is assigned to the relevant data:
-				addDimension = which(var %in% out$d000$var)
-				doNotAddDimension = which(!var %in% out$d000$var)
+				addDimension <- which(var %in% out$d000$var)
+				doNotAddDimension <- which(!var %in% out$d000$var)
+				
 				for(i in addDimension){
 					# Get the position of the current variable in the list of variables in out$d000$var:
-					dimind = which(out$d000$var==var[i])
+					dimind <- which(out$d000$var==var[i])
 					# Test for equality of the dimensions for ALL time steps. This also implies that t and cleant are identical:
-					allDimensionsEqual = all(tseq %in% out$d000$indx[[dimind]])  &&  all(sapply(out$d000$dims[[dimind]], function(x) x == out$d000$dims[[dimind]][[1]]))
+					allDimensionsEqual <- all(tseq %in% out$d000$indx[[dimind]])  &&  all(sapply(out$d000$dims[[dimind]], function(x) x == out$d000$dims[[dimind]][[1]]))
 					# Collapse variables with equal dimensions into arrays with time along the last dimension:
 					if(allDimensionsEqual){
 						# If the data were read using raw, and time steps had identical lengths for the current variable, skip unlisting:
 						if(!readRawAndEqualTimeSteps[i]){
-							out[[i]] = unlist(out[[i]], use.names=FALSE)
+							out[[i]] <- unlist(out[[i]], use.names=FALSE)
 						}
 						
-						newSingleDimension = out$d000$dims[[dimind]][[1]]
+						newSingleDimension <- out$d000$dims[[dimind]][[1]]
 						if(prod(newSingleDimension)>0){
 							###   # Add a time dimension if drop.out==FALSE, and the number of time steps is > 1, and also requiring that not all dimensions are 1 (single values, in which case )
 							###   # if(!drop.out && (length(t)>1 && !all(newSingleDimension==1))){
@@ -582,17 +586,17 @@ read.TSD <- function(con, t=1, var="all", dimension=TRUE, header=FALSE, max_var=
 							###   if((length(t)>1 && (!drop.out || !all(newSingleDimension==1)))){ # Removed on 2017-03-16, since also files of only one time steps should be returned with time dimension it drop.out=FALSE.
 							###   	
 							###   ### if(!drop.out || !all(newSingleDimension==1)){
-							###   	dim(out[[i]]) = c(newSingleDimension, length(t))
+							###   	dim(out[[i]]) <- c(newSingleDimension, length(t))
 							###   	}
 							###   else if(length(t)==1 && length(newSingleDimension)>1){
-							###   	dim(out[[i]]) = newSingleDimension
+							###   	dim(out[[i]]) <- newSingleDimension
 							###   	}
 								
 								
 								
 								
 							# First add single time dimensions and time:
-							dim(out[[i]]) = c(newSingleDimension, length(t))
+							dim(out[[i]]) <- c(newSingleDimension, length(t))
 							# Then remove the time dimension if drop.out==TRUE and time is of length 1:
 							if(drop.out && length(t)==1){
 								thisdim <- dim(out[[i]])
@@ -602,10 +606,10 @@ read.TSD <- function(con, t=1, var="all", dimension=TRUE, header=FALSE, max_var=
 					}
 					# Otherwise treat each time step separately:
 					else{
-						addDimension_j = which(tseq %in% out$d000$indx[[dimind]])
+						addDimension_j <- which(tseq %in% out$d000$indx[[dimind]])
 						for(j in addDimension_j){
-							dimind_time = which(out$d000$indx[[dimind]]==tseq[j])
-							dim(out[[i]][[j]]) = out$d000$dims[[dimind]][[dimind_time]]
+							dimind_time <- which(out$d000$indx[[dimind]]==tseq[j])
+							dim(out[[i]][[j]]) <- out$d000$dims[[dimind]][[dimind_time]]
 							}
 						}
 					}
@@ -614,16 +618,16 @@ read.TSD <- function(con, t=1, var="all", dimension=TRUE, header=FALSE, max_var=
 				if(all(validt)){
 					# Update 'lvar_char' with the new string lengths:
 					if(length(charvar)>0){
-						lvar_char[t, charvar] = unlist(lapply(out[charvar], function(x) lapply(x, length)), use.names=FALSE)
+						lvar_char[t, charvar] <- unlist(lapply(out[charvar], function(x) lapply(x, length)), use.names=FALSE)
 						}
 					# Get indices of the variables that have equal length for each time step:
 					# Fixed bug here by inserting  & x != 0, ensuring that variables with no data for the requested time steps are not collapsed if keep.all==TRUE:
-					allLengthsEqual = apply(lvar_char[t, var[doNotAddDimension], drop=FALSE], 2, function(x) all(x == x[1] & if(keep.all) x != 0 else TRUE))
+					allLengthsEqual <- apply(lvar_char[t, var[doNotAddDimension], drop=FALSE], 2, function(x) all(x == x[1] & if(keep.all) x != 0 else TRUE))
 					for(i in doNotAddDimension[allLengthsEqual]){
-						out[i] = list(unlist(out[[i]], use.names=FALSE))
+						out[i] <- list(unlist(out[[i]], use.names=FALSE))
 						# Add time step dimenstion if both the number of time steps and the lengths of the variables exceed 1:
 						if(length(out[[i]])>0 && (!drop.out || (length(t)>1 && lvar_char[t[1], var[i]]>1))){
-							dim(out[[i]]) = c(lvar_char[t[1], var[i]], length(t))
+							dim(out[[i]]) <- c(lvar_char[t[1], var[i]], length(t))
 							}
 						}
 					}
@@ -632,69 +636,69 @@ read.TSD <- function(con, t=1, var="all", dimension=TRUE, header=FALSE, max_var=
 		# If only one time steps is present, or if only one element is present for each and every time step of a variable, drop the list:
 		else if(drop.out){
 			if(length(t)==1){
-				out = lapply(out, unlist)
+				out <- lapply(out, unlist)
 				}
 			else{
-				allLengths1 = apply(lvar_char[t, var, drop=FALSE], 2, function(x) all(x == 1))
-				out[allLengths1] = lapply(out[allLengths1], unlist)
+				allLengths1 <- apply(lvar_char[t, var, drop=FALSE], 2, function(x) all(x == 1))
+				out[allLengths1] <- lapply(out[allLengths1], unlist)
 				}
 			}
 		
 		# Adding time variables:
 		if("utim" %in% timeout){
-			out$utim = utim.TSD(out)
+			out$utim <- utim.TSD(out)
 			}
 		if("mtim" %in% timeout){
-			out$mtim = mtim.TSD(out)
+			out$mtim <- mtim.TSD(out)
 			}
 		if("ftim" %in% timeout){
-			out$ftim = ftim.TSD(out)
+			out$ftim <- ftim.TSD(out)
 			}
 		
 		# Revert to the vector representation of 'd000':
-		namesout = names(out)
+		namesout <- names(out)
 		if(all(c("d000", "d000v") %in% namesout)){
-			out[namesout=="d000"] = out[namesout=="d000v"]
-			out[namesout=="d000v"] = NULL
+			out[namesout=="d000"] <- out[namesout=="d000v"]
+			out[namesout=="d000v"] <- NULL
 			}
 		
 		# Remove out$d000 if required:
 		if(!d000.out){
-			out[names(out)=="d000"] = NULL
+			out[names(out)=="d000"] <- NULL
 			}
 		
 		# Convert strings starting with "FUNCTION" to functions:
-		out = lapply(out, function(x) if(is.list(x)) lapply(x, read.TSD_funstring2fun) else read.TSD_funstring2fun(x))
+		out <- lapply(out, function(x) if(is.list(x)) lapply(x, read.TSD_funstring2fun) else read.TSD_funstring2fun(x))
 		} # End of if any output.
 	
 	# Creating the header object, to be returned if header==TRUE, and partly if any of the header names c("nvar", "labl", "lvar", "dtyp", "numt", "endian").
-	out_header = list()
-	out_header$nvar = nvar
-	out_header$numt = numt
-	out_header$r000 = r000
-	out_header$labl = labl
-	out_header$lvar = lvar_out
-	out_header$dtyp = dtyp
-	out_header$numt = as.double(numt)
+	out_header <- list()
+	out_header$nvar <- nvar
+	out_header$numt <- numt
+	out_header$r000 <- r000
+	out_header$labl <- labl
+	out_header$lvar <- lvar_out
+	out_header$dtyp <- dtyp
+	out_header$numt <- as.double(numt)
 	
 	if(endian=="swap"){
-		out_header$endian = setdiff(c("little", "big"), .Platform$endian)
+		out_header$endian <- setdiff(c("little", "big"), .Platform$endian)
 		}
 	else{
-		out_header$endian = .Platform$endian
+		out_header$endian <- .Platform$endian
 		}
 	# Add info to the output:
 	if(info && length(out)>0){
-		out$info = info.TSD(names(out), file=NULL)
+		out$info <- info.TSD(names(out), file=NULL)
 		}
 	
 	# Add 'out_header' if header==TRUE:
 	if(!identical(header, FALSE)){
-		out = c(out, out_header)
+		out <- c(out, out_header)
 		}
 	# Else add only the requested header variables (if any):
 	else{
-		out[headervar] = out_header[headervar]
+		out[headervar] <- out_header[headervar]
 		}
 	out
 	##################################################

@@ -95,6 +95,7 @@ write.TSD_fun_lvar<-function(y, numt, ts){
 			lvar = 0
 			}
 		}
+	
 	c(lvar, double(max(0, numt-length(lvar))))
 	##################################################
 	##################################################

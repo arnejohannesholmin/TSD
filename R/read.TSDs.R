@@ -17,7 +17,7 @@
 #' @param addNvar  is TRUE if a vector with the index number of the file from which each variable is read should be added to the output.
 #' @param silent  is FALSE to print progress bar. If the 'silent' should be set to FALSE in general, use options(verbose=TRUE).
 #' @param msg  is TRUE to print the time bar of the TSD-files.
-#' @param raw  is TRUE as default to read files quicker by reading the information as raw, and converting to the appropriate data types aferwards, which olny applies if the number of time steps exceed 20 and the number of values of the file does not exceed 'raw'.
+#' @param use.raw  is TRUE as default to read files quicker by reading the information as raw, and converting to the appropriate data types aferwards, which olny applies if the number of time steps exceed 20 and the number of values of the file does not exceed 'use.raw'.
 #' @param cores  is an integer specifying the number of cores to read the files over in parallel (should be lower than the number of cores in the computer).
 #'
 #' @return
@@ -31,7 +31,7 @@
 #' @export
 #' @rdname read.TSDs
 #'
-read.TSDs <- function(files, t=1, var="all", dimension=TRUE, header=FALSE, clean=TRUE, merge=FALSE, indt=FALSE, recursive=TRUE, drop.out=TRUE, keep.all=FALSE, info=FALSE, addNvar=FALSE, silent=!getOption("verbose"), msg=FALSE, raw=1e3, cores=1, reorderFiles=TRUE, ...){
+read.TSDs <- function(files, t=1, var="all", dimension=TRUE, header=FALSE, clean=TRUE, merge=FALSE, indt=FALSE, recursive=TRUE, drop.out=TRUE, keep.all=FALSE, info=FALSE, addNvar=FALSE, silent=!getOption("verbose"), msg=FALSE, use.raw=1e3, cores=1, reorderFiles=TRUE, ...){
 	
 	############ AUTHOR(S): ############
 	# Arne Johannes Holmin
@@ -62,7 +62,7 @@ read.TSDs <- function(files, t=1, var="all", dimension=TRUE, header=FALSE, clean
 	##### Preparation #####
 	read.TSD_one <- function(i, files, t, var, dimension, header, indt, keep.all, drop.out, info, silent){
 		# Keep empty dimensions if files are to be merged:
-		this <- suppressWarnings(TSD::read.TSD(con=files[i], t=t[[i]], var=var, dimension=dimension, header=header, indt=indt, keep.all=keep.all, drop.out=if(merge && lfiles>1) FALSE else drop.out, info=info, silent=silent, raw=1e3))
+		this <- suppressWarnings(TSD::read.TSD(con=files[i], t=t[[i]], var=var, dimension=dimension, header=header, indt=indt, keep.all=keep.all, drop.out=if(merge && lfiles>1) FALSE else drop.out, info=info, silent=silent, use.raw=1e3))
 		# Add empty list elements for unread variables if keep.all=TRUE:
 		if(keep.all){
 			thisfull = vector("list", length(var))
@@ -167,7 +167,7 @@ read.TSDs <- function(files, t=1, var="all", dimension=TRUE, header=FALSE, clean
 	### 			}
 	### 		# Keep empty dimensions if files are to be merged:
 	### 		this <- read.TSD_one(i, files, t, var, dimension, header, indt, keep.all, drop.out, info, silent)
-	### 		#this<-suppressWarnings(read.TSD(con=files[i], t=t[[i]], var=var, dimension=dimension, header=header, indt=indt, keep.all=keep.all, drop.out=if(merge && lfiles>1) FALSE else drop.out, info=info, silent=silent, raw=1e3))
+	### 		#this<-suppressWarnings(read.TSD(con=files[i], t=t[[i]], var=var, dimension=dimension, header=header, indt=indt, keep.all=keep.all, drop.out=if(merge && lfiles>1) FALSE else drop.out, info=info, silent=silent, use.raw=1e3))
 	### 		# Add empty list elements for unread variables if keep.all=TRUE:
 	### 		#if(keep.all){
 	### 		#	thisfull = vector("list", length(var))

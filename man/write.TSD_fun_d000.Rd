@@ -4,7 +4,7 @@
 \alias{write.TSD_fun_d000}
 \title{Function extracting the dimensions of the variable (possibly list) 'y'.}
 \usage{
-write.TSD_fun_d000(y, numt, ts)
+write.TSD_fun_d000(y, numt, ts, ind.out = FALSE)
 }
 \arguments{
 \item{y}{is an R object accepted by write.TSD().}

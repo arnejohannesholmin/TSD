@@ -42,20 +42,28 @@ write.TSD_modifyd000<-function(y, lablPresent){
 
 	##################################################
 	##################################################
-	lx=length(y)
-	at=1
-	while(at<lx){
-		narrays=y[at]
-		at=at+1
-		if(narrays>0){
-			ndim=y[at+seq(0, narrays-1)]
-			at=at+narrays
-			# Match against the existing file:
-			y[at+seq(0, narrays-1)]=lablPresent[match(y[at+seq(0, narrays-1)], lablPresent[, 1]), 2]
-			at=at+narrays+sum(ndim)
-			}
-		}
-	y
+	if(length(y$var)==0){
+		return(list())
+	}
+	else{
+		y$var <- lapply(y$var, function(x) lablPresent[match(x, lablPresent[, 1]), 2])
+		return(y)
+	}
+	
+	### lx <- length(y)
+	### at <- 1
+	### while(at<lx){
+	### 	narrays <- y[at]
+	### 	at <- at + 1
+	### 	if(narrays>0){
+	### 		ndim <- y[at + seq(0, narrays-1)]
+	### 		at <- at + narrays
+	### 		# Match against the existing file:
+	### 		y[at+seq(0, narrays-1)] <- lablPresent[match(y[at+seq(0, narrays-1)], lablPresent[, 1]), 2]
+	### 		at <- at + narrays + sum(ndim)
+	### 		}
+	### 	}
+	### y
 	##################################################
 	##################################################
 	}

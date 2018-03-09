@@ -46,30 +46,33 @@ is.TSD<-function(x, recursive=TRUE, accept.dir=TRUE){
 	##################################################
 	##### Preparation #####
 	# Get file pahts:
-	finfo=file.info(x)
+	finfo <- file.info(x)
 	if(length(x)==1 && is.na(finfo$isdir)){
 		warning("Non-existing path")
 		return(FALSE)
-		}
+	}
 	else if(length(x)==1 && !identical(finfo$isdir, FALSE)){
 		if(accept.dir){
-			x=list.files(x,recursive=recursive,full.names=TRUE)
-			}
+			x <- list.files(x, recursive=recursive, full.names=TRUE)
+		}
 		else{
 			warning(paste(x, "is a directory"))
 			return(FALSE)
-			}
 		}
+	}
 	
 		
 	##### Execution and output #####
-	out = rep(NA, length(x))
+	out <- rep(NA, length(x))
 	for(i in seq_along(x)){
-		first4=readChar(x[i],nchars=4,useBytes=TRUE)
-		out[i]=identical(first4,"%TSD")
-		}
-	names(out)=basename(x)
+		first4 <- readChar(x[i], nchars=4, useBytes=TRUE)
+		out[i] <- identical(first4, "%TSD")
+		#if(!out[i]){
+		#	print(first4)
+		#}
+	}
+	names(out) <- basename(x)
 	out
 	##################################################
 	##################################################
-	}
+}

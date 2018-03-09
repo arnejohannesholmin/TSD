@@ -14,7 +14,7 @@ and similar for the complex data types.}
 write.TSD(x, con, t = "all", var = "all", header = NULL, numt = NULL,
   dimension = TRUE, ts = "last", reserve = 0, keep.null = TRUE,
   dup = FALSE, endian = .Platform$endian, sep = " ", append = FALSE,
-  ow = TRUE, keep.float = FALSE, ...)
+  ow = TRUE, keep.float = FALSE, use.raw = 1000, ...)
 }
 \arguments{
 \item{x}{is the list containing the data to write.}

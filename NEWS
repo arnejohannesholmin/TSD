@@ -8,3 +8,5 @@ The TSD package Provides functions for reading, writing and other processing of 
 Added the option of reading multiple TSD files with read.TSDs() and returning the data in a list with one element per file.
 
 Moved development to GitHub
+
+Added the parameter 'use.raw' write.TSD() (and changed the exinsting 'raw' to 'use.raw' in read.TSD). Along with changes to the dimension information d000, this increased speed significantly for many time steps.
