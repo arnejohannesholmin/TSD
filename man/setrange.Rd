@@ -4,7 +4,7 @@
 \alias{setrange}
 \title{Sets the range of the input object 'x' to [a,b] (stretching or shrinking and displacing 'x').
 The calculation is done by the following procedure:
-(x-min(x))*(b-a)/(max(x)-min(x))+a = x*s-min(x)*s+a , s=(b-a)/(max(x)-min(x))
+(x - min(x)) * (b-a)  /  (max(x) - min(x)) + a   =   x * s - min(x) * s + a , s=(b-a)/(max(x)-min(x))
 									 = x*s+q , q=a-min(x)*s}
 \usage{
 setrange(x, a = 0, b = 1, clamp = NULL, check.ends = TRUE)
@@ -24,7 +24,7 @@ setrange(x, a = 0, b = 1, clamp = NULL, check.ends = TRUE)
 \description{
 Sets the range of the input object 'x' to [a,b] (stretching or shrinking and displacing 'x').
 The calculation is done by the following procedure:
-(x-min(x))*(b-a)/(max(x)-min(x))+a = x*s-min(x)*s+a , s=(b-a)/(max(x)-min(x))
+(x - min(x)) * (b-a)  /  (max(x) - min(x)) + a   =   x * s - min(x) * s + a , s=(b-a)/(max(x)-min(x))
 									 = x*s+q , q=a-min(x)*s
 }
 \examples{

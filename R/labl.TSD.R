@@ -63,7 +63,7 @@ labl.TSD <- function(var=NULL, adds=NULL, list.out=TRUE){
 	vesselnames <- c("psxv", "psyv", "pszv", "rtxv", "rtyv", "rtzv", "lonv", "latv", "lat0", "lon0", "ispv", "sadv")
 	
 	# The compactly specified dynamic variable names of the school:
-	compactschool <- c("psxS", "psyS", "pszS", "utmS", "ut9S", "aspS", "thtS", "phiS", "szxS", "szyS", "szzS", "rtxS", "rtyS", "rtzS", "scls", "SDxf", "SDyf", "SDzf", "sEdx", "sEdy", "sEdz", "shpS", "rhoS", "nbfS", "volS","volE", "MEsz", "SDsz", "PDsz", "seed", "sEds", "plHS")
+	compactschool <- c("psxS", "psyS", "pszS", "utmS", "ut9S", "aspS", "thtS", "phiS", "szxS", "szyS", "szzS", "rtxS", "rtyS", "rtzS", "scls", "SDxf", "SDyf", "SDzf", "sEdx", "sEdy", "sEdz", "shpS", "rhoS", "nbfS", "volS","volE", "MEsz", "SDsz", "PDsz", "seed", "sEds", "plHS", "hazS", "helS", "oazS", "oelS")
 	
 	# The dynamic variable names of the school:
 	#dynschoolnames <- c("psxf", "psyf", "pszf", "rtxf", "rtyf", "rtzf", "vlxf", "vlyf", "vlzf", "size", "Sctr", "Spar", "Sobj", "Sang")
@@ -71,7 +71,7 @@ labl.TSD <- function(var=NULL, adds=NULL, list.out=TRUE){
 	dynschoolnames_echoIBM <- c(dynschoolnames, "transducerposL", "lenl", "etaC", "etar4", "etaomega", "sgbs", "fish")
 	
 	# The static variable names of the school:
-	staticschoolnames <- c("indl", "acca", "size", "lenl", "mass", "tilt", "epsl", "gamw", "gaml", "obln", "zeta", "pbpf", "ssil", "grff", "graf", "gref", "grsf", "grif", "dbpf", "ebpf", "ssif", "sgbs", "epss", "spow")
+	staticschoolnames <- c("indl", "acca", "size", "lenl", "mass", "tilt", "epsl", "gamw", "gaml", "obln", "zeta", "pbpf", "ssil", "grff", "graf", "gref", "grsf", "grif", "dbpf", "ebpf", "ssif", "sgbs", "epss", "spow", "surv")
 	
 	specialBemasnames  <- unique(c("beams", "cali", "calf", "rad1", "rad2", "bwt1", "bwt2", "pbp1", "gra1", "gre1", "grs1", "gri1", "dbp1", "ebp1", "pbp2", "gra2", "gre2", "grs2", "gri2", "dbp2", "ebp2"))
 	beamsnamesGeneral  <- unique(c("esnm", "asps", "numb", "indi", "freq", "absr", "sint", "rres", "plsl", "psze", "lenb", "dira", "dire", "dirx", "diry", "dirz", "bwtl", "bwtt", "eqba", "sacr", "tpow", "gain", "bmmd"))
@@ -158,7 +158,18 @@ labl.TSD <- function(var=NULL, adds=NULL, list.out=TRUE){
 		"ispv", # 9  -  1 value per ping
 		"sadv", # 10  -  1 value per ping
 		"terr", # 10  -  1 value per ping
-		"nmtc") # 11 - 1 value per ping
+		"nmtc",  # 11 - 1 value per ping
+		"log1", 
+		"lon1", 
+		"lat1", 
+		"utm1", 
+		"log2", 
+		"lon2", 
+		"lat2", 
+		"utm2"
+		)
+		
+		
 
 	EKRaw2TSD_pingsnames <- c(
 		#"indt", # 1  -  1 value per ping
@@ -166,6 +177,9 @@ labl.TSD <- function(var=NULL, adds=NULL, list.out=TRUE){
 		"vbsc", # 3  -  max(lenb) * numb values per ping
 		"angl", # 4  -  max(lenb) * numb values per ping
 		"angt", # 10  -  1 value per ping
+		# 2018-08-15: Added the number of beams and length of the beams, in order to make the pings files more self-sufficient:
+		"numb", # 5  -  1 value per ping
+		"lenb", # 12  -  numb values per ping
 		"nmtc") # 5  -  max(lenb) * numb values per ping
 
 	EKRaw2TSD_ctdnames <- c(

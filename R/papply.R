@@ -23,11 +23,17 @@
 #' system.time(p <- papply(1:4, f, cores=2))
 #'
 #' @importFrom parallel makeCluster parLapply stopCluster detectCores
-#' @importFrom pbapply pblapply
+#' @importFrom pbapply pblapply pboptions
 #' @export
 #' @rdname papply
 #'
-papply <- function(X, FUN, ..., cores=1, outfile="", msg="Processing... "){
+papply <- function(X, FUN, ..., cores=1, outfile="", text="Processing... ", msg=TRUE){
+	
+	if(!msg){
+		pbo <- pbapply::pboptions(type = "none")
+		on.exit(pboptions(pbo))
+	}
+	
 	availableCores <- parallel::detectCores()
 	# If memory runs out, a system call to determine number of cores might fail, thus detectCores() could return NA
 	# defaulting to single core if this is the case
@@ -42,7 +48,7 @@ papply <- function(X, FUN, ..., cores=1, outfile="", msg="Processing... "){
 	
 	# Generate the clusters of time steps:
 	if(cores>1){
-		cat(paste0(msg, "(", nruns, " runs using ", cores, " cores in parallel):\n"))
+		cat(paste0(text, "(", nruns, " runs using ", cores, " cores in parallel):\n"))
 		cl <- parallel::makeCluster(cores)
 		# Bootstrap:
 		out <- pbapply::pblapply(X, FUN, ..., cl=cl)
@@ -50,108 +56,8 @@ papply <- function(X, FUN, ..., cores=1, outfile="", msg="Processing... "){
 		parallel::stopCluster(cl)
 	}
 	else{
-		cat(paste0(msg, "(", nruns, " runs):\n"))
+		cat(paste0(text, "(", nruns, " runs):\n"))
 		out <- pbapply::pblapply(X, FUN, ...)
 	}
 	return(out)
-	### cores <- min(parallel::detectCores(), cores, length(X))
-	### #msgfun <- getMSG(msg)
-	### if(cores==1){
-	### 	#if(length(formals(msgfun))){
-	### 	#	out <- lapply(X, FUN, ..., msgfun=msgfun)
-	### 	#}
-	### 	#else{
-	### 		out <- lapply(X, FUN, ...)
-	### 	#}
-	### }
-	### else{
-	### 	cl <- parallel::makeCluster(cores, outfile=outfile)
-	### 	#if(length(formals(msgfun))){
-	### 	#	out <- parallel::parLapply(cl, X, FUN, ..., msgfun=msgfun)
-	### 	#}
-	### 	#else{
-	### 		out <- parallel::parLapply(cl, X, FUN, ...)
-	### 	#}
-	### 	parallel::stopCluster(cl)
-	### }
-	### #cat("\n")
-	### out
 }
-### #'
-### #' @export
-### #' @rdname papply
-### #'
-### getMSG_old <- function(msg=list()){
-### 	if(length(msg) && all(c("len", "msg") %in% names(msg))){
-### 		N <- rev(cumprod(rev(msg$len)))
-### 		allN <- max(N)
-### 		cat(msg$msg,"\n",sep="")
-### 		nch <- if(length(msg$w) && startsWith(msg$w[1], "c")) options()$width else nchar(msg$msg)
-### 		stepfact = nch / allN
-### 	
-### 		s <- floor(seq_len(allN) * stepfact)
-### 		diffs <- c(0, diff(s))
-### 		step <- diffs==1
-### 		fact <- c(N[-1], 1)
-### 	
-### 		fun <- function(ind){
-### 			if(length(dim(ind))==2){
-### 				flatind <- 1 + rowSums(matrix(fact, byrow=TRUE, ncol=length(fact), nrow=nrow(ind)) * (ind - 1))
-### 			}
-### 			else{
-### 				flatind <- 1 + sum(fact * (ind - 1))
-### 			}
-### 			cat(rep(".", sum(step[flatind])), sep="")
-### 			if(flatind==allN){
-### 				cat("\n")
-### 			}
-### 		}
-### 	}
-### 	else{
-### 		fun <- function(...) NULL
-### 	}
-### 	fun
-### }
-### #'
-### #' @export
-### #' @rdname papply
-### #'
-### getMSG <- function(msg="Processing:", len=NULL, ind=NULL, width=c("message", "console")){
-### 	nch <- if(startsWith(width[1], "c")) options()$width else nchar(msg)
-### 	
-### 	if(length(len)){
-### 		N <- rev(cumprod(rev(len)))
-### 		allN <- max(N)
-### 		stepfact = nch / allN
-### 	
-### 		s <- floor(seq_len(allN) * stepfact)
-### 		diffs <- c(0, diff(s))
-### 		step <- diffs==1
-### 		fact <- c(N[-1], 1)
-### 	
-### 		fun <- function(ind){
-### 			flatind <- 1 + sum(fact * (ind - 1))
-### 			
-### 			cat(rep(".", sum(step[flatind])), sep="")
-### 			if(flatind==allN){
-### 				cat("\n")
-### 			}
-### 		}
-### 	}
-### 	else if(length(ind)){
-### 		N <- rapply(ind, length)
-### 		allN <- sum(N)
-### 		stepfact = nch / allN
-### 	
-### 		
-### 		#ind <- rapply(ind, function(xx) {oldflatind <- flatind; flatind <<- flatind + length(xx); oldflatind + seq_along(xx)}, how="replace")
-### 		
-### 	}
-### 	else{
-### 		fun <- function(...) NULL
-### 	}
-### 	
-### 	cat(msg, "\n", sep="")
-### 	fun
-### }
-### 

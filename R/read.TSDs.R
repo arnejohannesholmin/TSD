@@ -2,23 +2,23 @@
 #*********************************************
 #' Reads files using the Time Step Data format and outputs as an R-list object where the elements are named according to the four character names provided in the file 'con'. The output list is stripped of duplicate names if clean==TRUE. See the documentation on echoIBM for specification of the Time Step Data format (TSD). Header not returned as it may differ between files.
 #'
-#' @param files  is a vector of the TSD files or a directory containing TSD files (recursive).
-#' @param t  is a vector of the time steps to read, or a list of time step vectors, if different time steps are to be read for each file. If t=="all", all time steps are read, and if t=="none" only the header is returned, (or if header==FALSE list() is returned).
-#' @param var  is a vector of the variables to read, either given as a character vector holding the names of the variables to read, as specified in the TSD-format, or as the number of the variable in 'labl', if 'labl' is known. If var="all", all variables are read. If none of the elements of 'var' are in [1, nvar], or if var=="none", (or if header==FALSE list() is returned). See read.TSD() for legal variable names.
-#' @param dimension  is TRUE to return data with dimension.
-#' @param header  is TRUE if the number 'nvar', the lengths 'lvar', the labels 'labl', the types 'dtyp' of the variables, and the number 'numt' of time steps are to be returned (at the end of the output list). If the header (list of variables nvar, labl, lvar, dtyp, numt, endian) of the file is known or has already been read, time can be saved by setting header equal to the existing header, in which case the header will not be read.
-#' @param clean  is is TRUE to delete duplicatedly named elements. If clean is NULL, data read from multiple files are returned in a list with one element per file.
-#' @param merge  is is TRUE to merge all elements of equal names to one vector/matrix/list:.
-#' @param indt  is TRUE if the time points specified in 't' are to be cross referenced to time indexes 'indt' in the data, if present.
-#' @param recursive  used if a directory is given in 'files', determining whether listing of files should listing recurse into directories.
-#' @param drop.out  is TRUE to drop empty dimensions of arrays and unlist lists of length 1.
-#' @param keep.all  is TRUE to return all variables for all files, even though no data are read (useful when reading one variable, and which files contain that variable is important). Also used in read.TSD().
-#' @param info  is TRUE if the variable 'info' returned from info.TSD() should be added to the output (applied in read.TSD()).
-#' @param addNvar  is TRUE if a vector with the index number of the file from which each variable is read should be added to the output.
-#' @param silent  is FALSE to print progress bar. If the 'silent' should be set to FALSE in general, use options(verbose=TRUE).
-#' @param msg  is TRUE to print the time bar of the TSD-files.
-#' @param use.raw  is TRUE as default to read files quicker by reading the information as raw, and converting to the appropriate data types aferwards, which olny applies if the number of time steps exceed 20 and the number of values of the file does not exceed 'use.raw'.
-#' @param cores  is an integer specifying the number of cores to read the files over in parallel (should be lower than the number of cores in the computer).
+#' @param files		is a vector of the TSD files or a directory containing TSD files (recursive).
+#' @param t			is a vector of the time steps to read, or a list of time step vectors, if different time steps are to be read for each file. If t=="all", all time steps are read, and if t=="none" only the header is returned, (or if header==FALSE list() is returned).
+#' @param var		is a vector of the variables to read, either given as a character vector holding the names of the variables to read, as specified in the TSD-format, or as the number of the variable in 'labl', if 'labl' is known. If var="all", all variables are read. If none of the elements of 'var' are in [1, nvar], or if var=="none", (or if header==FALSE list() is returned). See read.TSD() for legal variable names.
+#' @param dimension	is TRUE to return data with dimension.
+#' @param header	is TRUE if the number 'nvar', the lengths 'lvar', the labels 'labl', the types 'dtyp' of the variables, and the number 'numt' of time steps are to be returned (at the end of the output list). If the header (list of variables nvar, labl, lvar, dtyp, numt, endian) of the file is known or has already been read, time can be saved by setting header equal to the existing header, in which case the header will not be read.
+#' @param clean		is is TRUE to delete duplicatedly named elements. If clean is NULL, data read from multiple files are returned in a list with one element per file.
+#' @param merge		is is TRUE to merge all elements of equal names to one vector/matrix/list:.
+#' @param indt		is TRUE if the time points specified in 't' are to be cross referenced to time indexes 'indt' in the data, if present.
+#' @param recursive	used if a directory is given in 'files', determining whether listing of files should listing recurse into directories.
+#' @param drop.out	is TRUE to drop empty dimensions of arrays and unlist lists of length 1.
+#' @param keep.all	is TRUE to return all variables for all files, even though no data are read (useful when reading one variable, and which files contain that variable is important). Also used in read.TSD().
+#' @param info		is TRUE if the variable 'info' returned from info.TSD() should be added to the output (applied in read.TSD()).
+#' @param addNvar	is TRUE if a vector with the index number of the file from which each variable is read should be added to the output.
+#' @param silent	is FALSE to print progress bar. If the 'silent' should be set to FALSE in general, use options(verbose=TRUE).
+#' @param msg		is TRUE to print the time bar of the TSD-files.
+#' @param use.raw	is TRUE as default to read files quicker by reading the information as raw, and converting to the appropriate data types aferwards, which olny applies if the number of time steps exceed 20 and the number of values of the file does not exceed 'use.raw'.
+#' @param cores		is an integer specifying the number of cores to read the files over in parallel (should be lower than the number of cores in the computer).
 #'
 #' @return
 #'
@@ -62,7 +62,7 @@ read.TSDs <- function(files, t=1, var="all", dimension=TRUE, header=FALSE, clean
 	##### Preparation #####
 	read.TSD_one <- function(i, files, t, var, dimension, header, indt, keep.all, drop.out, info, silent){
 		# Keep empty dimensions if files are to be merged:
-		this <- suppressWarnings(TSD::read.TSD(con=files[i], t=t[[i]], var=var, dimension=dimension, header=header, indt=indt, keep.all=keep.all, drop.out=if(merge && lfiles>1) FALSE else drop.out, info=info, silent=silent, use.raw=1e3))
+		this <- suppressWarnings(read.TSD(con=files[i], t=t[[i]], var=var, dimension=dimension, header=header, indt=indt, keep.all=keep.all, drop.out=if(merge && lfiles>1) FALSE else drop.out, info=info, silent=silent, use.raw=1e3))
 		# Add empty list elements for unread variables if keep.all=TRUE:
 		if(keep.all){
 			thisfull = vector("list", length(var))

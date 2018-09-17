@@ -2,7 +2,7 @@
 #*********************************************
 #' Sets the range of the input object 'x' to [a,b] (stretching or shrinking and displacing 'x').
 #' The calculation is done by the following procedure:
-#' (x-min(x))*(b-a)/(max(x)-min(x))+a = x*s-min(x)*s+a , s=(b-a)/(max(x)-min(x))
+#' (x - min(x)) * (b-a)  /  (max(x) - min(x)) + a   =   x * s - min(x) * s + a , s=(b-a)/(max(x)-min(x))
 #' 									 = x*s+q , q=a-min(x)*s
 #'
 #' @param x  is the input object. If all elements are equal, all elements are replaced by 'a'.

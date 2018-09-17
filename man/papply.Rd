@@ -4,7 +4,8 @@
 \alias{papply}
 \title{Parallel version of lapply}
 \usage{
-papply(X, FUN, ..., cores = 1, outfile = "", msg = "Processing... ")
+papply(X, FUN, ..., cores = 1, outfile = "", text = "Processing... ",
+  msg = TRUE)
 }
 \arguments{
 \item{X, FUN, ...}{See lapply.}
