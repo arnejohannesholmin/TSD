@@ -313,6 +313,7 @@ sfsi	The indices of the beams considered to be afected by surface scattering, an
 sgbE	Indices for the segmentation mask of the bottom reverberation [SeGmentation mask of the BoTtom]
 sgbs	(Optimal) backscattering cross section of the point targets [SiGma BackScattering, from the notation in Holmin et al. 2012]
 sgbt	Indices for the enlarged segmentation mask of the bottom reverberation [SeGmentation mask of the Bottom Enlarged]
+sgID	Segmentation ID, e.g., school ID [SeGmentation ID]
 sgmt	A numeric vector of the indices of the voxels inside an arbitrary segment of the acoustic data [SeGMenTation mask]
 sgpx	The x position of the voxels inside the segmentation mask [SeGmentated Position of voxel along global X axis]
 sgpy	The y position of the voxels inside the segmentation mask [SeGmentated Position of voxel along global Y axis]

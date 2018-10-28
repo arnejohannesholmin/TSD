@@ -60,6 +60,7 @@ labl.TSD <- function(var=NULL, adds=NULL, list.out=TRUE){
 	timenames = c("utim", "mtim", "ftim", "indt")
 	#timenames = c("utim", "mtim", "ctim", "ftim", "indt")
 	# The variable names of the vessel:
+	compressed_vesselnames <- c("log1",	"lon1",	"lat1",	"utm1",	"log2",	"lon2",	"lat2",	"utm2")
 	vesselnames = c("psxv", "psyv", "pszv", "rtxv", "rtyv", "rtzv", "lonv", "latv", "lat0", "lon0", "ispv", "sadv")
 	
 	# The compactly specified dynamic variable names of the school:
@@ -156,7 +157,8 @@ labl.TSD <- function(var=NULL, adds=NULL, list.out=TRUE){
 		"ispv", # 9  -  1 value per ping
 		"sadv", # 10  -  1 value per ping
 		"terr", # 10  -  1 value per ping
-		"nmtc") # 11 - 1 value per ping
+		"nmtc", # 11 - 1 value per ping
+		compressed_vesselnames)
 
 	EKRaw2TSD_pingsnames = c(
 		#"indt", # 1  -  1 value per ping

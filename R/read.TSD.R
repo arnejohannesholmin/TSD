@@ -14,7 +14,7 @@
 #' @param drop.out  is TRUE to drop empty dimensions of arrays and unlist lists of length 1.
 #' @param info  is TRUE if the variable 'info' returned from info.TSD() should be added to the output (applied in read.TSD()).
 #' @param silent  is FALSE to print progress bar. If the 'silent' should be set to FALSE in general, use options(verbose=TRUE).
-#' @param raw  is TRUE to read files quicker by reading the information as raw, and converting to the appropriate data types aferwards, which olny applies if the number of time steps exceed 20 and the number of values of the file does not exceed 'raw'.
+#' @param raw  is TRUE to read files quicker by reading the information as raw, and converting to the appropriate data types aferwards, which only applies if the number of time steps exceed 20 and the number of values of the file does not exceed 'raw'.
 #'
 #' @return
 #'
@@ -107,7 +107,7 @@ read.TSD <- function(con, t=1, var="all", dimension=TRUE, header=FALSE, max_var=
 	# The files are structured in a specific way. (1) a four byte float holding the number of variables. (2) a four byte long holding the number of time steps of the file. (3) a four byte long holding the number of rows of the 'lvar' information. (4) the lvar information, given as a long-matrix of one row for each time step or only one row if all variables have constant number of elements for each time step. (5) a vector of four character labels of the variables. (6) a vector of four character data dype information strings:
 	
 	# Test for the TSD format:
-	if(!is.TSD(conname,recursive=FALSE,accept.dir=FALSE)){
+	if(!is.TSD(conname, recursive=FALSE, accept.dir=FALSE)){
 		warning(paste("The path\"", conname, "\"is not a TSD file", sep=""))
 		return(list())
 		}

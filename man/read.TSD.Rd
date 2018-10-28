@@ -34,7 +34,7 @@ read.TSD(con, t = 1, var = "all", dimension = TRUE, header = FALSE,
 
 \item{silent}{is FALSE to print progress bar. If the 'silent' should be set to FALSE in general, use options(verbose=TRUE).}
 
-\item{raw}{is TRUE to read files quicker by reading the information as raw, and converting to the appropriate data types aferwards, which olny applies if the number of time steps exceed 20 and the number of values of the file does not exceed 'raw'.}
+\item{raw}{is TRUE to read files quicker by reading the information as raw, and converting to the appropriate data types aferwards, which only applies if the number of time steps exceed 20 and the number of values of the file does not exceed 'raw'.}
 }
 \value{
 
