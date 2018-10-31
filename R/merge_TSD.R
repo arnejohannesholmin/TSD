@@ -314,7 +314,7 @@ merge_TSD<-function(x, dir=NULL, indt=FALSE, reserve=TRUE, recursive=FALSE, test
 		
 		
 		
-		
+		# out <- papply(seq_along(fileGroups), mergeOneFileGroup, dir=dir, fileGroups=fileGroups, files=x, indt=indt, drop.out=drop.out, adds=adds, reserve=reserve, clear_along=clear_along, skipLast=skipLast, linked=linked, filenames_out=filenames_out, numt=numt, pb=FALSE, cl=cores)
 		
 		#if(cores==1 || length(fileGroups)==1){
 		#	mergeOneFileGroup(i=i, dir=dir, fileGroups=fileGroups, x=x, indt=indt, drop.out=drop.out, adds=adds, reserve=reserve, clear_along=clear_along, cores=cores, skipLast=skipLast, linked=linked, msgfun=msgfun)

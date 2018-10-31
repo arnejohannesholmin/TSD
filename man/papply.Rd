@@ -4,8 +4,12 @@
 \alias{papply}
 \title{Parallel version of lapply}
 \usage{
+<<<<<<< HEAD
 papply(X, FUN, ..., cores = 1, outfile = "", text = "Processing... ",
   msg = TRUE)
+=======
+papply(X, FUN, ..., cores = 1, outfile = "", msg = NULL, pb = TRUE)
+>>>>>>> develop
 }
 \arguments{
 \item{X, FUN, ...}{See lapply.}

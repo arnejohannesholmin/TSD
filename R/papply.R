@@ -27,10 +27,10 @@
 #' @export
 #' @rdname papply
 #'
-papply <- function(X, FUN, ..., cores=1, outfile="", text="Processing... ", msg=TRUE){
+papply <- function(X, FUN, ..., cores=1, outfile="", msg=NULL, pb=TRUE){
 	
-	if(!msg){
-		pbo <- pbapply::pboptions(type = "none")
+	if(!pb){
+		pbo <- pboptions(type = "none")
 		on.exit(pboptions(pbo))
 	}
 	
@@ -48,7 +48,9 @@ papply <- function(X, FUN, ..., cores=1, outfile="", text="Processing... ", msg=
 	
 	# Generate the clusters of time steps:
 	if(cores>1){
-		cat(paste0(text, "(", nruns, " runs using ", cores, " cores in parallel):\n"))
+		if(length(msg) && !identical(msg, FALSE)){
+			cat(paste0(msg, "(", nruns, " runs using ", cores, " cores in parallel):\n"))
+		}
 		cl <- parallel::makeCluster(cores)
 		# Bootstrap:
 		out <- pbapply::pblapply(X, FUN, ..., cl=cl)
@@ -56,7 +58,9 @@ papply <- function(X, FUN, ..., cores=1, outfile="", text="Processing... ", msg=
 		parallel::stopCluster(cl)
 	}
 	else{
-		cat(paste0(text, "(", nruns, " runs):\n"))
+		if(length(msg) && !identical(msg, FALSE)){
+			cat(paste0(msg, "(", nruns, " runs):\n"))
+		}
 		out <- pbapply::pblapply(X, FUN, ...)
 	}
 	return(out)

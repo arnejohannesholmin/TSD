@@ -617,17 +617,17 @@ interpret.mtim<-function(x){
 	# Start: 2013-07-11 - Clean version.
 
 	##### Preparation #####
-	ncharx=nchar(x)
-	m=ncharx<=6
-	u=ncharx %in% c(9,10)
-	f=ncharx %in% c(8,13,14)
+	ncharx <- nchar(if(is.numeric(x)) round(x) else x)
+	m <- ncharx <= 6
+	u <- ncharx %in% c(9, 10)
+	f <- ncharx %in% c(8, 13, 14)
 	
 
 	##### Execution #####
-	mtim=NAs(length(x))
-	mtim[m]=x[m]
-	mtim[u]=utim2mtim(x[u])
-	mtim[f]=ftim2mtim(x[f])
+	mtim <- NAs(length(x))
+	mtim[m] <- x[m]
+	mtim[u] <- utim2mtim(x[u])
+	mtim[f] <- ftim2mtim(x[f])
 	
 	
 	##### Output #####
