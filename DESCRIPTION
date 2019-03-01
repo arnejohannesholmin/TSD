@@ -1,6 +1,6 @@
 Package: TSD
 Title: Read and write in the Time Step Data (TSD) format
-Version: 1.1
+Version: 1.3
 Authors@R: c(
   person("Arne Johannes", "Holmin", role = c("aut","cre"), email = "arnejh@imr.no"))
 Author: Arne Johannes Holmin [aut, cre],
