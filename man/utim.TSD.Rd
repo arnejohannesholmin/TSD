@@ -92,8 +92,6 @@ interpret.mtim(x)
 \code{FILETIME2mtim} Transforms Windows FILETIME to UTC Matlab time.
 \code{FILETIME2utim} Transforms Windows FILETIME to UNIX time.
 \code{interpret.mtim} Transforms time given either as MATLAB serial date number 'mtim' (number of days since January 0, 0000), 'utim' (number of seconds elapsed since UTC 00:00, 1970-01-01), or 'ftim' (yyyyddHHMMSS.FFF or yyyymmddSSSSS.FFF) to MATLAB serial date number.
-
-\dontrun{}
 }
 \examples{
 \dontrun{}

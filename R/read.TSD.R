@@ -65,7 +65,7 @@ read.TSD <- function(con, t=1, var="all", dimension=TRUE, header=FALSE, max_var=
 	##### Preparation #####
 	### Connection: ###
 	# Get the name of the file:
-	if("file" %in% is(con)){
+	if("file" %in% class(con)){
 		conname <- summary(con)$description
 		close(con)
 		}
@@ -191,12 +191,10 @@ read.TSD <- function(con, t=1, var="all", dimension=TRUE, header=FALSE, max_var=
 	
 	# If 'indt' is given as input, and a variable named 'indt' is present in the data, 't' is cross referenced to these time steps indexes so that if indt=1, 11, 21, and t=1:12, the first two time steps are read:
 	if(!identical(t, 0) && !identical(var, 0) && indt && "indt" %in% labl){
-		# 'indtat' is the indices of the 'indt' variables:
-		indtat <- which("indt"==labl)
 		# When 'indt' is requested, a file of many pings may cause reading 'indt' to be a slow process. Thus a test is made for continnuity of 'indt', in which case only the first and last value is read, and the sequence between these is returned as 'indt':
-		indt_con <- read.TSD_getindtFirstLast(labl, con, index, dtyp_present, valid_datatypes, datasizes, endian)
+		indt_con <- read.TSD_getindtFirstLast(labl, con=con, index=index, datatypes=valid_datatypes[dtyp_present], datasizes=datasizes[dtyp_present], endian=endian)
 		# Otherwise, read the indt variable convensionally:
-		indt_con <- read.TSD_readAllTimeStepsOfOneVariable(nrow(index), lvar=lvar, var=indtat, con=con, index=index, dtyp=dtyp, valid_datatypes=valid_datatypes, dtyp_present=dtyp_present, datasizes=datasizes, endian=endian, arecomplex=arecomplex)
+		indt_con <- read.TSD_readAllTimeStepsOfOneVariable(nrow(index), lvar=lvar, labl=labl, con=con, index=index, dtyp=dtyp, datatypes=valid_datatypes[dtyp_present], datasizes=datasizes[dtyp_present], endian=endian, arecomplex=arecomplex)
  		
 		# Treat 't' given 'indt_con':
  		if(identical(t, "all")){
@@ -297,10 +295,10 @@ read.TSD <- function(con, t=1, var="all", dimension=TRUE, header=FALSE, max_var=
 			}
 		else{	
 			# If 'indt' is requested, a file of many pings may cause reading 'indt' to be a slow process. Thus a test is made for continnuity of 'indt', in which case only the first and last value is read, and the sequence between these is returned as 'indt':
-			indt_con <- read.TSD_getindtFirstLast(labl, con, index, dtyp_present, valid_datatypes, datasizes, endian)
+			indt_con <- read.TSD_getindtFirstLast(labl, con=con, index=index, datatypes=valid_datatypes[dtyp_present], datasizes=datasizes[dtyp_present], endian=endian)
 			# Otherwise, read the indt variable convensionally:
 			if(length(indt_con)==0){
-				indt_con <- read.TSD_readAllTimeStepsOfOneVariable(nrow(index), lvar=lvar, var=which("indt"==labl), con=con, index=index, dtyp=dtyp, valid_datatypes=valid_datatypes, dtyp_present=dtyp_present, datasizes=datasizes, endian=endian, arecomplex=arecomplex)
+				indt_con <- read.TSD_readAllTimeStepsOfOneVariable(nrow(index), lvar=lvar, labl=labl, con=con, index=index, dtyp=dtyp, datatypes=valid_datatypes[dtyp_present], datasizes=datasizes[dtyp_present], endian=endian, arecomplex=arecomplex)
 				}
 			
  			# Insert to the output:

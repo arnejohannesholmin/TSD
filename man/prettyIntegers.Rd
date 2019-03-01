@@ -4,12 +4,16 @@
 \alias{prettyIntegers}
 \title{Compressed formating of an integer vector.}
 \usage{
-prettyIntegers(x, force = FALSE, sep = "...", collapse = ", ")
+prettyIntegers(x, force = FALSE, collapse = ", ", sep = "...")
 }
 \arguments{
-\item{x}{is an integer vector.}
+\item{x}{An integer vector.}
 
-\item{force}{is TRUE if the new string should be returned regardless of whether it has more characters than the original.}
+\item{force}{Logical: If TRUE the new string should be returned regardless of whether it has more characters than the original.}
+
+\item{collapse}{The string to separate numbers by.}
+
+\item{sep}{The string to separate numbers by when printing ranges.}
 }
 \value{
 

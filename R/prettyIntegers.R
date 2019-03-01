@@ -2,8 +2,10 @@
 #*********************************************
 #' Compressed formating of an integer vector.
 #'
-#' @param x  is an integer vector.
-#' @param force  is TRUE if the new string should be returned regardless of whether it has more characters than the original.
+#' @param x			An integer vector.
+#' @param force		Logical: If TRUE the new string should be returned regardless of whether it has more characters than the original.
+#' @param collapse	The string to separate numbers by.
+#' @param sep		The string to separate numbers by when printing ranges.
 #'
 #' @return
 #'
@@ -13,31 +15,14 @@
 #' @export
 #' @rdname prettyIntegers
 #'
-prettyIntegers <- function(x, force=FALSE, sep="...", collapse=", "){
+prettyIntegers <- function(x, force=FALSE, collapse=", ", sep="..."){
 	
-	############ AUTHOR(S): ############
-	# Arne Johannes Holmin
-	############ LANGUAGE: #############
-	# English
 	############### LOG: ###############
 	# Start: 2014-01-29 - First version.
-	########### DESCRIPTION: ###########
-	# Compressed formating of an integer vector.
-	########## DEPENDENCIES: ###########
-	#
-	############ VARIABLES: ############
-	# ---x--- is an integer vector.
-	# ---force--- is TRUE if the new string should be returned regardless of whether it has more characters than the original.
 	
-	
-	##################################################
-	##################################################
-	########## Preparation ##########
 	lx <- length(x)
 	
-	
-	########## Execution and output ##########
-	if(lx<3){
+	if(lx < 3){
 		paste(x, collapse=collapse)
 		}
 	else{
@@ -111,6 +96,4 @@ prettyIntegers <- function(x, force=FALSE, sep="...", collapse=", "){
 			newx
 		}
 	}
-	##################################################
-	##################################################
 }

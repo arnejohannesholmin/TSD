@@ -4,11 +4,11 @@
 \alias{read.TSDs}
 \title{Reads files using the Time Step Data format and outputs as an R-list object where the elements are named according to the four character names provided in the file 'con'. The output list is stripped of duplicate names if clean==TRUE. See the documentation on echoIBM for specification of the Time Step Data format (TSD). Header not returned as it may differ between files.}
 \usage{
-read.TSDs(files, t = 1, var = "all", dimension = TRUE, header = FALSE,
-  clean = TRUE, merge = FALSE, indt = FALSE, recursive = TRUE,
-  drop.out = TRUE, keep.all = FALSE, info = FALSE, addNvar = FALSE,
-  silent = !getOption("verbose"), msg = FALSE, use.raw = 1000,
-  cores = 1, reorderFiles = TRUE, ...)
+read.TSDs(files, t = 1, var = "all", dimension = TRUE,
+  header = FALSE, clean = TRUE, merge = FALSE, indt = FALSE,
+  recursive = TRUE, drop.out = TRUE, keep.all = FALSE,
+  info = FALSE, addNvar = FALSE, silent = !getOption("verbose"),
+  msg = FALSE, use.raw = 1000, cores = 1, ...)
 }
 \arguments{
 \item{files}{is a vector of the TSD files or a directory containing TSD files (recursive).}
@@ -44,6 +44,8 @@ read.TSDs(files, t = 1, var = "all", dimension = TRUE, header = FALSE,
 \item{use.raw}{is TRUE as default to read files quicker by reading the information as raw, and converting to the appropriate data types aferwards, which olny applies if the number of time steps exceed 20 and the number of values of the file does not exceed 'use.raw'.}
 
 \item{cores}{is an integer specifying the number of cores to read the files over in parallel (should be lower than the number of cores in the computer).}
+
+\item{...}{Used in \code{\link{combine.TSD}}.}
 }
 \value{
 

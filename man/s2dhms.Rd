@@ -2,17 +2,27 @@
 % Please edit documentation in R/s2dhms.R
 \name{s2dhms}
 \alias{s2dhms}
+\alias{m2dhm}
 \title{Transforms seconds to an array of days, hours, minutes and seconds.}
 \usage{
-s2dhms(sec, digits = 3, clock.out = FALSE, names = c("d", "h", "m", "s"),
+s2dhms(sec, digits = 3, clock.out = FALSE, names = c("d", "h", "m",
+  "s"), strip = FALSE, drop = FALSE)
+
+m2dhm(m, digits = 3, clock.out = FALSE, names = c("d", "h", "m"),
   strip = FALSE, drop = FALSE)
 }
 \arguments{
-\item{sec}{is the input seconds.}
+\item{sec}{The input seconds.}
 
-\item{digits}{is the number of digits of the "seconds" part of the output.}
+\item{digits}{The number of digits of the "seconds" part of the output.}
 
-\item{clock.out}{is TRUE if the time excluding the days are to be returned as a string vector of elements HH:MM:SS.FFF (two digits).}
+\item{clock.out}{Logical: If TRUE the time excluding the days are to be returned as a string vector of elements HH:MM:SS.FFF (two digits).}
+
+\item{names}{Names of the output columns.}
+
+\item{strip, drop}{Logical: If TRUE strip off e.g. hours when 0, and in that case drop the output if drop=TRUE.}
+
+\item{m}{The input minutes.}
 }
 \value{
 

@@ -2,19 +2,13 @@
 % Please edit documentation in R/write.TSD.R
 \name{write.TSD}
 \alias{write.TSD}
-\title{Writes files using the Time Step Data format. See the documentation on echoIBM for specification of the Time Step Data format (TSD). Handling of missing values differ between data types, as given in the table below, which gives the values that are stored in the file when given as NA, NaN, NA_real_, or NA_integer_ in the data:
-NA
-NA
-NA
-NA
-NA
-NA
-and similar for the complex data types.}
+\title{Writes files using the Time Step Data format.}
 \usage{
-write.TSD(x, con, t = "all", var = "all", header = NULL, numt = NULL,
-  dimension = TRUE, ts = "last", reserve = 0, keep.null = TRUE,
-  dup = FALSE, endian = .Platform$endian, sep = " ", append = FALSE,
-  ow = TRUE, keep.float = FALSE, use.raw = 1000, ...)
+write.TSD(x, con, t = "all", var = "all", header = NULL,
+  numt = NULL, dimension = TRUE, ts = "last", reserve = 0,
+  keep.null = TRUE, dup = FALSE, endian = .Platform$endian,
+  append = FALSE, ow = TRUE, keep.float = FALSE, use.raw = 1000,
+  ...)
 }
 \arguments{
 \item{x}{is the list containing the data to write.}
@@ -33,9 +27,21 @@ write.TSD(x, con, t = "all", var = "all", header = NULL, numt = NULL,
 
 \item{ts}{is a numeric vector specifying the rules for regarding the last dimensions of arrays as time: If the number of dimensions of an array is included in the set 'ts' the last dimension of that array is considered to be along time, so that if ts = 3 and we wish to write an array of dimension [3, 4, 2], this array will be written as two [3, 4] arrays. 'ts' is utilized through seq_along(dim(x))[ts], so that if ts = -2 matrices are not regarded as having time along the second dimension.}
 
+\item{reserve}{The number of time steps to reserve for future appending to the file (in which case 'reserve' rows of zeros are appended in 'lvar' in the header).}
+
+\item{keep.null}{Logical: If FALSE elements of length 0 should be discarded from the data, in which case a numerical 'var' would represent indices of 'x' AFTER empty elements have been removed.}
+
+\item{dup}{Logical: If TRUE allow for duplicated variable label. If dup = FALSE (default) all variables with the same label as a previous variable in the input list 'x' are removed.}
+
+\item{endian}{The endian of the file, defaulted to .Platform$endian (changed from "big" by Arne Johannes Holmin 2012-07-31).}
+
 \item{append}{is TRUE if data is to be appended to the end of 'con' (only valid when 'con' is a character string), in which case the header is not written. No check made for compatibility to the existing file.}
 
 \item{ow}{is TRUE if the user wish to overwrite existing file.}
+
+\item{keep.float}{Logical: If TRUE scan the data for double presicion (large numbers). Use this to ensure no loss of presicion (TIME DEMANDING (0.2 sec for 1324*500*117 values)).}
+
+\item{use.raw}{Either a logical where TRUE reads the time steps (which must be in a sequence) first and then converts to appropriate values, or as the total numer of values of each time step below which the raw method is used.}
 
 \item{...}{is to allow variables passed on from other methods.}
 }
@@ -43,16 +49,46 @@ write.TSD(x, con, t = "all", var = "all", header = NULL, numt = NULL,
 
 }
 \description{
-Writes files using the Time Step Data format. See the documentation on echoIBM for specification of the Time Step Data format (TSD). Handling of missing values differ between data types, as given in the table below, which gives the values that are stored in the file when given as NA, NaN, NA_real_, or NA_integer_ in the data:
-NA
-NA
-NA
-NA
-NA
-NA
+See the documentation on echoIBM for specification of the Time Step Data format (TSD). Handling of missing values differ between data types, as given in the table below, which gives the values that are stored in the file when given as NA, NaN, NA_real_, or NA_integer_ in the data:
+\tabular{rrrrr}{
+  Value			\tab Data type	\tab		\tab		\tab 		\cr
+  				\tab floa		\tab doub	\tab shrt	\tab long	\cr
+  NA				\tab 0			\tab NaN	\tab 0		\tab NA		\cr
+  NaN			\tab NaN		\tab NaN	\tab 0		\tab NA		\cr
+  NA_real_		\tab NaN		\tab NA		\tab 0		\tab NA		\cr
+  NA_integer_	\tab NaN		\tab NA		\tab 0		\tab NA		\cr
+}
 and similar for the complex data types.
 }
 \examples{
-\dontrun{}
+\dontrun{
+# Write some data to a TSD file (all variable must have 4 character names):
+dat <- list(
+	var1=list(
+		array(runif(2*3*4), dim=c(2,3,4)), 
+		array(runif(7*4), dim=c(7,4))
+		), 
+	var2=list(
+	
+		c("Time step 1", "ebaerb"), 
+		c("Last time step")
+		), 
+	var3=list(
+		complex(real=1:12, imaginary=runif(12)), 
+		NULL
+		)
+	)
+TSDfile <- tempfile()
+write.TSD(dat, TSDfile, numt=2)
+datread <- read.TSD(TSDfile, t="all")
+
+# Differs in precision of the first variable 'var1':
+all.equal(dat, datread)
+
+# Set the first varialbe to double precision:
+write.TSD(dat, TSDfile, numt=2, header=list(dtyp=list(var1="doub")))
+datread <- read.TSD(TSDfile, t="all")
+all.equal(dat, datread)
+}
 
 }

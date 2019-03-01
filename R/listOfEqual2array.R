@@ -2,6 +2,8 @@
 #*********************************************
 #' (Internal) Convert a list of equal lengths to an array.
 #'
+#' @param x	A list.
+#'
 #' @return
 #'
 #' @examples

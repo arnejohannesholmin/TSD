@@ -7,9 +7,11 @@
 dim_all(x, null.out = NULL, old = TRUE)
 }
 \arguments{
-\item{x}{is the input object.}
+\item{x}{The input object.}
 
-\item{null.out}{is the value to return from NULL.}
+\item{null.out}{The value to return from NULL.}
+
+\item{old}{Deprecated. Logical: If TRUE use the old function.}
 }
 \value{
 

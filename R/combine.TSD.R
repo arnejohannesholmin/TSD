@@ -2,21 +2,25 @@
 #*********************************************
 #' Merges either (1) TSD files given by 'x', or (2) four character named TSD variables in the list 'x', as returned when reading mutiple TSD files. List elements of identical names are collapsed.
 #'
-#' @param x				is a list of TSD-data, or a directory or vector of TSD-files to be merged, in which case a new directory is created with the merged data.
-#' @param dir			is the directory in which to put the merged file(s).
-#' @param indt			is used then merging TSD-data in the list 'x', causing values for duplicated time steps to be discarded (the variable 'indt' must be present, one for each file/group of data).
-#' @param reserve		is FALSE if time steps should not be reserved, requiring that the lengths and dimensions of the variables in the files to merge match exactly.
-#' @param recursive		is used when listing the files to be merged, and if set to TRUE files in subfolders will be included as well.
-#' @param test.TSD		is TRUE to discard files that are not TSD files (could be time consuming).
-#' @param filesize		is the maximum size of the merged files.
-#' @param chunksize		is the maximum size of the chunks of file read at the time.
-#' @param clear_along	is TRUE to clear files that have been merged imediately after merging.
-#' @param drop.out		is TRUE to clear files that have been merged imediately after merging.
-#' @param adds			is TRUE to clear files that have been merged imediately after merging.
-#' @param linked		is a list of file paths of the same length as 'x' (or the file list of 'x'), holding files that should be merged using the same file grouping as used for 'x'.
-#' @param skipLast		is TRUE to discard the last file in the merging, and simply copy it to the merged-directory.
-#' @param skipLast		Logical: If FALSE, the progress bar is suppressed.
-#' @param ...  			are possible inputs to other functions.
+#' @param x				A list of TSD-data, or a directory or vector of TSD-files to be merged, in which case a new directory is created with the merged data.
+#' @param dir			The directory in which to put the merged file(s).
+#' @param indt			Used then merging TSD-data in the list 'x', causing values for duplicated time steps to be discarded (the variable 'indt' must be present, one for each file/group of data).
+#' @param reserve		Logical: If FALSE time steps should not be reserved, requiring that the lengths and dimensions of the variables in the files to merge match exactly.
+#' @param recursive		Used when listing the files to be merged, and if set to TRUE files in subfolders will be included as well.
+#' @param test.TSD		Logical: If TRUE discard files that are not TSD files (could be time consuming).
+#' @param filesize		The maximum size of the merged files.
+#' @param chunksize		The maximum size of the chunks of file read at the time.
+#' @param clear_along	Logical: If TRUE clear files that have been merged imediately after merging.
+#' @param drop.out		Logical: If TRUE drop dimensions of the output.
+#' @param adds			An optional list of variables added before merging.
+#' @param msg			Logical: If TRUE print progress and messages to the console.
+#' @param linked		A list of file paths of the same length as 'x' (or the file list of 'x'), holding files that should be merged using the same file grouping as used for 'x'.
+#' @param skipLast		Logical: If TRUE discard the last file in the merging, and simply copy it to the merged-directory.
+#' @param cores			The number of cores to run parallel mering on.
+#' @param keep.lists	Logical: If TRUE, keep the output as lists.
+#' @param pad			See \code{\link{mergeListKeepDimensions}}.
+#' @param pbar			Logical: If FALSE, the progress bar is suppressed.
+#' @param ...  			Possible inputs to other functions.
 #'
 #' @return
 #'
@@ -28,10 +32,10 @@
 #' @importFrom utils tail
 #'
 #' @export
-#' @rdname merge_TSD
+#' @rdname combine.TSD
 #'
-merge_TSD<-function(x, dir=NULL, indt=FALSE, reserve=TRUE, recursive=FALSE, test.TSD=FALSE, filesize=3e8, chunksize=3e8, clear_along=FALSE, drop.out=FALSE, adds=NULL, msg=TRUE, linked=list(), skipLast=FALSE, cores=1, keep.lists=FALSE, pad=TRUE, pbar=TRUE, ...){
-	#merge_TSD<-function(x, dir=NULL, indt=FALSE, reserve=TRUE, recursive=FALSE, #test.TSD=FALSE, filesize=3e8, chunksize=1e8, clear_along=FALSE, drop.out=FALSE, adds=NULL, fileGroups=NULL, numt=NULL, ...){
+combine.TSD <- function(x, dir=NULL, indt=FALSE, reserve=TRUE, recursive=FALSE, test.TSD=FALSE, filesize=3e8, chunksize=3e8, clear_along=FALSE, drop.out=FALSE, adds=NULL, msg=TRUE, linked=list(), skipLast=FALSE, cores=1, keep.lists=FALSE, pad=TRUE, pbar=TRUE, ...){
+	#combine.TSD<-function(x, dir=NULL, indt=FALSE, reserve=TRUE, recursive=FALSE, #test.TSD=FALSE, filesize=3e8, chunksize=1e8, clear_along=FALSE, drop.out=FALSE, adds=NULL, fileGroups=NULL, numt=NULL, ...){
 	
 	############### LOG: ###############
 	# Start: 2011-10-21 - Clean version.
@@ -44,8 +48,6 @@ merge_TSD<-function(x, dir=NULL, indt=FALSE, reserve=TRUE, recursive=FALSE, test
 	# Last: 2016-07-25 - Added the parameter 'linked', which is a list of file paths of the same length as 'x' (or the file list of 'x'), holding files that should be merged using the same file grouping as used for 'x'.
 	
 
-	##################################################
-	##################################################
 	# Function that merges one file group:
 	merge_one <- function(files, inputMergeFile, dir, fileGroups, i, j, indt, drop.out, adds, reserve, clear_along, skipLast, numt){
 		thisfiles = files[fileGroups[[i]][[j]]]
@@ -64,7 +66,7 @@ merge_TSD<-function(x, dir=NULL, indt=FALSE, reserve=TRUE, recursive=FALSE, test
 		}
 		
 		# Read file:
-		thisdata = read.TSDs(thisfiles, t="all", info=FALSE, merge=TRUE, keep.all=TRUE, indt=indt, drop.out=drop.out, msg=FALSE, pad=pad)
+		thisdata = read.TSDs(thisfiles, t="all", info=FALSE, merge=TRUE, keep.all=TRUE, indt=indt, drop.out=drop.out, msg=FALSE)
 		# This is done inside read.TSDs!!!!!!:
 		#thisdata = lapply(thisdata, mergeListKeepDimensions, pad=pad)
 		
@@ -389,6 +391,4 @@ merge_TSD<-function(x, dir=NULL, indt=FALSE, reserve=TRUE, recursive=FALSE, test
 			out[[1]]
 		}
 	}
-	##################################################
-	##################################################
 }

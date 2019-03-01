@@ -6,6 +6,9 @@
 \usage{
 listOfEqual2array(x)
 }
+\arguments{
+\item{x}{A list.}
+}
 \value{
 
 }

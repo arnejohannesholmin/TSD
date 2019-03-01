@@ -4,9 +4,8 @@
 \alias{read.TSD_getindtFirstLast}
 \title{A function for extracting the first and last value of 'indt'.}
 \usage{
-read.TSD_getindtFirstLast(labl, con, index, dtyp_present,
-  valid_datatypes = c("character", "int", "int", "int", "double", "double"),
-  datasizes = c(1, 1, 2, 4, 4, 8), endian = .Platform$endian)
+read.TSD_getindtFirstLast(labl, con, index, datatypes, datasizes,
+  endian = .Platform$endian)
 }
 \arguments{
 \item{labl}{is a vector of the TSD labels of the file.}
@@ -15,9 +14,9 @@ read.TSD_getindtFirstLast(labl, con, index, dtyp_present,
 
 \item{index}{is a matrix of the positions in the type of the variables and time steps.}
 
-\item{valid_datatypes}{are a vector of data types read by read.TSD().}
+\item{datatypes}{The data types of each element of 'labl'.}
 
-\item{datasizes}{are the sizes in bytes of the data types in 'valid_datatypes'.}
+\item{datasizes}{The data sizes of each element of 'labl'.}
 
 \item{endian}{is the endianness of the file, changed if the float is not read properly.}
 }

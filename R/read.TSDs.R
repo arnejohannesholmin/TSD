@@ -19,6 +19,7 @@
 #' @param msg		is TRUE to print the time bar of the TSD-files.
 #' @param use.raw	is TRUE as default to read files quicker by reading the information as raw, and converting to the appropriate data types aferwards, which olny applies if the number of time steps exceed 20 and the number of values of the file does not exceed 'use.raw'.
 #' @param cores		is an integer specifying the number of cores to read the files over in parallel (should be lower than the number of cores in the computer).
+#' @param ...		Used in \code{\link{combine.TSD}}.
 #'
 #' @return
 #'
@@ -31,7 +32,7 @@
 #' @export
 #' @rdname read.TSDs
 #'
-read.TSDs <- function(files, t=1, var="all", dimension=TRUE, header=FALSE, clean=TRUE, merge=FALSE, indt=FALSE, recursive=TRUE, drop.out=TRUE, keep.all=FALSE, info=FALSE, addNvar=FALSE, silent=!getOption("verbose"), msg=FALSE, use.raw=1e3, cores=1, reorderFiles=TRUE, ...){
+read.TSDs <- function(files, t=1, var="all", dimension=TRUE, header=FALSE, clean=TRUE, merge=FALSE, indt=FALSE, recursive=TRUE, drop.out=TRUE, keep.all=FALSE, info=FALSE, addNvar=FALSE, silent=!getOption("verbose"), msg=FALSE, use.raw=1e3, cores=1, ...){
 	
 	############ AUTHOR(S): ############
 	# Arne Johannes Holmin
@@ -45,7 +46,7 @@ read.TSDs <- function(files, t=1, var="all", dimension=TRUE, header=FALSE, clean
 	# Update: 2010-11-19 - Added the options 'all.list' and 'recursive'.
 	# Update: 2010-11-19 - Removed the option 'recursive', which was used when merge=TRUE due to a misunderstanding. Also the method for merging lists was changed and improved to return arrays if all duplicated elements have the same dimension up to the last dimension, and lists if else.
 	# Update: 2011-06-26 - Added the option 'recursive'.
-	# Update: 2011-10-21 - Added the function merge_TSD().
+	# Update: 2011-10-21 - Added the function combine.TSD().
 	# Update: 2012-07-31 - Added the option 'r000' for specifying the number of time steps. This is used when reading 'lvar' and reduces CPU time.
 	# Update: 2012-12-12 - Added info to the output.
 	# Update: 2013-05-07 - Added the parameters 'info' and 'addNvar' controling, respectively, whether 'info' or a vector of the index number of the file from which each variable is read, should be added to the output.
@@ -110,12 +111,13 @@ read.TSDs <- function(files, t=1, var="all", dimension=TRUE, header=FALSE, clean
 		# Detect the number of cores and use the minimum of this and the number of requested cores:	
 		cores = min(cores, length(files), detectCores())
 		
-		# Order the files so that files are read as close to each other as possible (reading in the order 1:L for L files if all files are read equally long):
-		if(reorderFiles){
-			cc = lapply(parallel::splitIndices(length(l), cores), function(i) l[i])
-			cc = unlist(lapply(seq_len(cores), function(xx) seq(xx, by=cores, l=length(cc[[xx]]))), use.names=FALSE)
-			l = l[rank(cc)]
-		}
+		# Not sure that this was...
+		## Order the files so that files are read as close to each other as possible (reading in the order 1:L for L files if all files are read equally long):
+		#if(reorderFiles){
+		#	cc = lapply(parallel::splitIndices(length(l), cores), function(i) l[i])
+		#	cc = unlist(lapply(seq_len(cores), function(xx) seq(xx, by=cores, l=length(cc[[xx]]))), use.names=FALSE)
+		#	l = l[rank(cc)]
+		#}
 	}
 	
 	# Progress bar parallel processing (if cores>1):
@@ -215,7 +217,7 @@ read.TSDs <- function(files, t=1, var="all", dimension=TRUE, header=FALSE, clean
 	# If 'clean' is TRUE, duplicatedly named elements are removed, and if 'merge' is TRUE all elements of equal names are merged to one vector or matrix or list:
 	if(isTRUE(merge)){
 		# If 'indt' is present in the data, and indt = TRUE, collapse by removing duplicated time steps for variables with length 1 per time step:
-		out = merge_TSD(out, indt=indt, ...)
+		out = combine.TSD(out, indt=indt, ...)
 	}
 	if(isTRUE(clean)){
 		out = out[!duplicated(names(out))]

@@ -4,8 +4,29 @@
 \alias{read.TSD_readAllTimeStepsOfOneVariable}
 \title{(Internal) Read all time steps of one variable in a TSD file.}
 \usage{
-read.TSD_readAllTimeStepsOfOneVariable(numtInFile, lvar, var, con, index, dtyp,
-  valid_datatypes, dtyp_present, datasizes, endian, arecomplex)
+read.TSD_readAllTimeStepsOfOneVariable(numtInFile, lvar, labl, con, index,
+  dtyp, datatypes, datasizes, endian, arecomplex)
+}
+\arguments{
+\item{numtInFile}{The number of time steps in the file.}
+
+\item{lvar}{The lvar info read from the header of the file.}
+
+\item{labl}{The labl info read from the header of the file.}
+
+\item{con}{A connection to a binary file, as returned by file(x,"rb").}
+
+\item{index}{A matrix of the positions in the type of the variables and time steps.}
+
+\item{dtyp}{A matrix of the positions in the type of the variables and time steps.}
+
+\item{datatypes}{The data types of each element of 'labl'.}
+
+\item{datasizes}{The data sizes of each element of 'labl'.}
+
+\item{endian}{The endianness of the file, changed if the float is not read properly.}
+
+\item{arecomplex}{Logical vector labeling variables as complex type.}
 }
 \value{
 

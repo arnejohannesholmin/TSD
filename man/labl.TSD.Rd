@@ -7,9 +7,11 @@
 labl.TSD(var = NULL, adds = NULL, list.out = TRUE)
 }
 \arguments{
-\item{var}{is the variable classes for which variable names are requested. Implemented variable classes are:}
+\item{var}{The variable classes for which variable names are requested. Use names(labl.TSD()) to see implemented variable classes are.}
 
-\item{adds}{is a vector of additional variables to include.}
+\item{adds}{A vector of additional variables to include.}
+
+\item{list.out}{Logical: If FALSE, unlist the output when multiple elements are requested in var.}
 }
 \value{
 

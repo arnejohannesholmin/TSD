@@ -2,8 +2,9 @@
 #*********************************************
 #' Returns the variable names required in echoIBM() and related functions, given as four character strings of names as stored in the TSD format. The aim of this function is to avoid errors due to misspelling.
 #'
-#' @param var  is the variable classes for which variable names are requested. Implemented variable classes are:
-#' @param adds  is a vector of additional variables to include.
+#' @param var		The variable classes for which variable names are requested. Use names(labl.TSD()) to see implemented variable classes are.
+#' @param adds		A vector of additional variables to include.
+#' @param list.out	Logical: If FALSE, unlist the output when multiple elements are requested in var.
 #'
 #' @return
 #'
@@ -15,44 +16,11 @@
 #'
 labl.TSD <- function(var=NULL, adds=NULL, list.out=TRUE){
 	
-	############ AUTHOR(S): ############
-	# Arne Johannes Holmin
-	############ LANGUAGE: #############
-	# English
 	############### LOG: ###############
 	# Start: 2011-08-05 - Clean version.
 	# Update: 2011-08-07 - Changed to have as input the name of the variable class, and added the option of adding varibles using 'adds'.
 	# Last: 2013-01-07 - Added relevant beams, ctd, and pdns variables, and segmentation variables.
-	########### DESCRIPTION: ###########
-	# Returns the variable names required in echoIBM() and related functions, given as four character strings of names as stored in the TSD format. The aim of this function is to avoid errors due to misspelling.
-	########## DEPENDENCIES: ###########
-	#
-	########## VALUE: ###########
-	#
-	############ VARIABLES: ############
-	# ---var--- is the variable classes for which variable names are requested. Implemented variable classes are:
-	#		"ds" - dynamic school variable names
-	#		"ss" - static school variable names
-	#		"v" - vessel variable names
-	#		"b" - beams variable names
-	#		"rb" - relevant beams variable names
-	#		"c" - ctd variable names
-	#		"rc" - relevant ctd variable names
-	#		"reqc" - required ctd variables (used in noise.path())
-	#		"t" - time variable names
-	#		"rp" - relevant periodic noise variable names
-	#		"sg" - segmentation variable names
-	#		"as" - acoustic and segmentation variables
-	#		"vx" - voxels positions and volume data
-	#		"reqnoise" - required noise estimate variables (used in noise.path())
-	#		"reqcorr" - required correlation estimate variables (used in noise.path())
-	#		"echoibm.generate_oneschool_labl" - variables required by the funciton echoibm.generate_oneschool()
-	#		"applotoutput" - output variables of applot()
-	# ---adds--- is a vector of additional variables to include.
 	
-	
-	##################################################
-	##################################################
 	########## Preparation ##########
 	# Time variables:
 	acousticnames <- c("mvbs", "vbsc", "tlns")
@@ -145,7 +113,8 @@ labl.TSD <- function(var=NULL, adds=NULL, list.out=TRUE){
 		"Ccal", # 10  -  numb value per ping
 		"rofs", # 10  -  1 value per ping
 		"sofs", # 10  -  1 value per ping
-		"nmtc") # 34  -  1 value per ping
+		"nmtc" # 34  -  1 value per ping
+	)
 	
 	EKRaw2TSD_vesselnames <- c(
 		"indt", # 1  -  1 value per ping
@@ -160,7 +129,8 @@ labl.TSD <- function(var=NULL, adds=NULL, list.out=TRUE){
 		"sadv", # 10  -  1 value per ping
 		"terr", # 10  -  1 value per ping
 		"nmtc", # 11 - 1 value per ping
-		compressed_vesselnames)
+		compressed_vesselnames
+	)
 
 	EKRaw2TSD_pingsnames <- c(
 		#"indt", # 1  -  1 value per ping
@@ -171,7 +141,8 @@ labl.TSD <- function(var=NULL, adds=NULL, list.out=TRUE){
 		# 2018-08-15: Added the number of beams and length of the beams, in order to make the pings files more self-sufficient:
 		"numb", # 5  -  1 value per ping
 		"lenb", # 12  -  numb values per ping
-		"nmtc") # 5  -  max(lenb) * numb values per ping
+		"nmtc" # 5  -  max(lenb) * numb values per ping
+	)
 
 	EKRaw2TSD_ctdnames <- c(
 		"mtim", # 1  -  1 value per raw time step
@@ -185,8 +156,8 @@ labl.TSD <- function(var=NULL, adds=NULL, list.out=TRUE){
 		"rho0", # 9  -  #depths value per raw time step
 		"gacc", # 10  -  #depths value per raw time step
 		"hpr0", # 11  -  #depths value per raw time step
-		"asps") # 12  -  #depths value per raw time step
-		
+		"asps" # 12  -  #depths value per raw time step
+	)
 		
 	EKRaw2TSD_rawvesselnames <- c(
 		"imtm", # 1  -  1 value per raw time step
@@ -194,12 +165,11 @@ labl.TSD <- function(var=NULL, adds=NULL, list.out=TRUE){
 		"ilnv", # 1  -  1 value per raw time step
 		"irzv", # 1  -  1 value per raw time step
 		"iisv", # 1  -  1 value per raw time step
-		"isdv") # 1  -  1 value per raw time step
-		
-
+		"isdv" # 1  -  1 value per raw time step
+	)
 
 	# Gather the names in a list having the apropriate names:
-	varnames<-list(
+	varnames <- list(
 		a = acousticnames, 
 		ds = dynschoolnames, 
 		dse = dynschoolnames_echoIBM, 
@@ -235,20 +205,19 @@ labl.TSD <- function(var=NULL, adds=NULL, list.out=TRUE){
 		ekraw2tsd_v = EKRaw2TSD_vesselnames,
 		ekraw2tsd_p = EKRaw2TSD_pingsnames, 
 		ekraw2tsd_c = EKRaw2TSD_ctdnames, 
-		ekraw2tsd_r = EKRaw2TSD_rawvesselnames)
+		ekraw2tsd_r = EKRaw2TSD_rawvesselnames
+	)
 	
 	
 	########## Execution and output ##########
 	# Extract the requested names:
 	if(length(var)==0){
 		var <- names(varnames)
-		}
+	}
 	out <- varnames[tolower(var)]
 	if(length(var)==1 || !list.out){
 		out <- unlist(out)
-		}
+	}
 	
 	c(out, adds)
-	##################################################
-	##################################################
-	}
+}

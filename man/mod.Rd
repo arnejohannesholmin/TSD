@@ -6,6 +6,9 @@
 \usage{
 mod(x, y)
 }
+\arguments{
+\item{x, y}{The input vectors.}
+}
 \value{
 
 }

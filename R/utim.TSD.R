@@ -238,10 +238,15 @@ utim2ftim<-function(x, format="yyyymmddHHMMSS.FFF", digits=3, indt=NULL, split=F
 	# Last: 2014-05-27 - Added 'indt'.
 
 	##### Preparation #####
+	if(tolower(format) == "iso"){
+		format <- "yyyy-mm-dd HH:MM:SS.FFF"
+	}
+	
 	if(length(x)==0){
 		return(NULL)
 	}
 	x = round(x, digits=digits)
+	
 	
 	
 	##### Execution #####
@@ -479,6 +484,10 @@ mtim2ftim<-function(x, format="yyyymmddHHMMSS.FFF", digits=3, indt=NULL, split=F
 	# Start: 2010-01-30 - Clean version.
 
 	##### Preparation #####
+	if(tolower(format) == "iso"){
+		format <- "yyyy-mm-dd HH:MM:SS.FFF"
+	}
+	
 	if(length(x)==0){
 		return(NULL)
 	}

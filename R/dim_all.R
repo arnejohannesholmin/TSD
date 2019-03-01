@@ -2,8 +2,9 @@
 #*********************************************
 #' Returns the dimension of the object 'x'. If 'x' is a list, a list of dimensions is returned. If 'x' is a vector length(x) is returned. If 'x' is NULL, 'null.out' is returned.
 #'
-#' @param x  is the input object.
-#' @param null.out	  is the value to return from NULL.
+#' @param x			The input object.
+#' @param null.out	The value to return from NULL.
+#' @param old		Deprecated. Logical: If TRUE use the old function.
 #'
 #' @return
 #'
@@ -15,24 +16,10 @@
 #'
 dim_all<-function(x, null.out=NULL, old=TRUE){
 	
-	############ AUTHOR(S): ############
-	# Arne Johannes Holmin
-	############ LANGUAGE: #############
-	# English
 	############### LOG: ###############
 	# Start: 2009-02-15 - Finished.
 	# Start: 2012-07-24 - Added support for extracting the dimenstion of list elements down to the 5'th level.
-	########### DESCRIPTION: ###########
-	# Returns the dimension of the object 'x'. If 'x' is a list, a list of dimensions is returned. If 'x' is a vector length(x) is returned. If 'x' is NULL, 'null.out' is returned.
-	########## DEPENDENCIES: ###########
-	#
-	############ VARIABLES: ############
-	# ---x--- is the input object.
-	# ---null.out	--- is the value to return from NULL.
 		
-	
-	##################################################
-	##################################################
 	##### Preparation ####
 	notArray <- function(x){
 		is.list(x) && !is.data.frame(x)
@@ -41,14 +28,14 @@ dim_all<-function(x, null.out=NULL, old=TRUE){
 	dims.array = function(x,null.out=NULL){
 		if(length(x)==0){
 			return(null.out)
-			}
+		}
 		else if(is.vector(x) || is.factor(x)){
 			return(length(x))
-			}
+		}
 		else if(is.data.frame(x) || is.array(x)){
 			return(dim(x))
-			}
 		}
+	}
 		
 	
 	##### Execution and output #####
@@ -71,15 +58,13 @@ dim_all<-function(x, null.out=NULL, old=TRUE){
 					else dims.array(y3))
 				else dims.array(y2))
 			else dims.array(y1))
-			}
+		}
 		# Not good for data.frames:
 		else{
 			rapply(x,  dims.array, how="replace")
-			}
 		}
+	}
 	else{
 		dims.array(x, null.out=null.out)
-		}
-	##################################################
-	##################################################
 	}
+}

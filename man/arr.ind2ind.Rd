@@ -4,7 +4,7 @@
 \alias{arr.ind2ind}
 \title{Transforms array indexes to vector indexes. For indexes out of bounds NA is returned. The function is transformed from the function which().}
 \usage{
-arr.ind2ind(arr.ind, shape, allow.outside = FALSE)
+arr.ind2ind(arr.ind, shape)
 }
 \arguments{
 \item{arr.ind}{is either a list of subscripts, as typed into [], or an array indexes, to be transformed to vector indexes.}

@@ -1,12 +1,16 @@
 #*********************************************
 #*********************************************
-#' Writes files using the Time Step Data format. See the documentation on echoIBM for specification of the Time Step Data format (TSD). Handling of missing values differ between data types, as given in the table below, which gives the values that are stored in the file when given as NA, NaN, NA_real_, or NA_integer_ in the data:
-#' NA
-#' NA
-#' NA
-#' NA
-#' NA
-#' NA
+#' Writes files using the Time Step Data format. 
+#' 
+#' See the documentation on echoIBM for specification of the Time Step Data format (TSD). Handling of missing values differ between data types, as given in the table below, which gives the values that are stored in the file when given as NA, NaN, NA_real_, or NA_integer_ in the data:
+#' \tabular{rrrrr}{
+#'   Value			\tab Data type	\tab		\tab		\tab 		\cr
+#'   				\tab floa		\tab doub	\tab shrt	\tab long	\cr
+#'   NA				\tab 0			\tab NaN	\tab 0		\tab NA		\cr
+#'   NaN			\tab NaN		\tab NaN	\tab 0		\tab NA		\cr
+#'   NA_real_		\tab NaN		\tab NA		\tab 0		\tab NA		\cr
+#'   NA_integer_	\tab NaN		\tab NA		\tab 0		\tab NA		\cr
+#' }
 #' and similar for the complex data types.
 #'
 #' @param x  is the list containing the data to write.
@@ -17,26 +21,56 @@
 #' @param numt  is the number of time points of the data 'x' overriding any existing information about the number of time steps, given in 'header' or 'x' (intended to only be specified if all time steps are arranged in the same vector for all variables).
 #' @param dimension  is an object specifying whether the dimensions of the variables at each time step are to be stored in the file. 'dimension' may have 4 values:
 #' @param ts  is a numeric vector specifying the rules for regarding the last dimensions of arrays as time: If the number of dimensions of an array is included in the set 'ts' the last dimension of that array is considered to be along time, so that if ts = 3 and we wish to write an array of dimension [3, 4, 2], this array will be written as two [3, 4] arrays. 'ts' is utilized through seq_along(dim(x))[ts], so that if ts = -2 matrices are not regarded as having time along the second dimension.
+#' @param reserve	The number of time steps to reserve for future appending to the file (in which case 'reserve' rows of zeros are appended in 'lvar' in the header).
+#' @param keep.null	Logical: If FALSE elements of length 0 should be discarded from the data, in which case a numerical 'var' would represent indices of 'x' AFTER empty elements have been removed.
+#' @param dup		Logical: If TRUE allow for duplicated variable label. If dup = FALSE (default) all variables with the same label as a previous variable in the input list 'x' are removed.
+#' @param endian	The endian of the file, defaulted to .Platform$endian (changed from "big" by Arne Johannes Holmin 2012-07-31).
 #' @param append  is TRUE if data is to be appended to the end of 'con' (only valid when 'con' is a character string), in which case the header is not written. No check made for compatibility to the existing file.
 #' @param ow  is TRUE if the user wish to overwrite existing file.
+#' @param keep.float	Logical: If TRUE scan the data for double presicion (large numbers). Use this to ensure no loss of presicion (TIME DEMANDING (0.2 sec for 1324*500*117 values)).
+#' @param use.raw		Either a logical where TRUE reads the time steps (which must be in a sequence) first and then converts to appropriate values, or as the total numer of values of each time step below which the raw method is used.
 #' @param ...  is to allow variables passed on from other methods.
 #'
 #' @return
 #'
 #' @examples
-#' \dontrun{}
+#' \dontrun{
+#' # Write some data to a TSD file (all variable must have 4 character names):
+#' dat <- list(
+#' 	var1=list(
+#' 		array(runif(2*3*4), dim=c(2,3,4)), 
+#' 		array(runif(7*4), dim=c(7,4))
+#' 		), 
+#' 	var2=list(
+#' 	
+#' 		c("Time step 1", "ebaerb"), 
+#' 		c("Last time step")
+#' 		), 
+#' 	var3=list(
+#' 		complex(real=1:12, imaginary=runif(12)), 
+#' 		NULL
+#' 		)
+#' 	)
+#' TSDfile <- tempfile()
+#' write.TSD(dat, TSDfile, numt=2)
+#' datread <- read.TSD(TSDfile, t="all")
+#' 
+#' # Differs in precision of the first variable 'var1':
+#' all.equal(dat, datread)
+#'
+#' # Set the first varialbe to double precision:
+#' write.TSD(dat, TSDfile, numt=2, header=list(dtyp=list(var1="doub")))
+#' datread <- read.TSD(TSDfile, t="all")
+#' all.equal(dat, datread)
+#' }
 #'
 #' @importFrom stats na.omit
 #'
 #' @export
 #' @rdname write.TSD
 #'
-write.TSD <- function(x, con, t="all", var="all", header=NULL, numt=NULL, dimension=TRUE, ts="last", reserve=0, keep.null=TRUE, dup=FALSE, endian=.Platform$endian, sep=" ", append=FALSE, ow=TRUE, keep.float=FALSE, use.raw=1e3, ...){
+write.TSD <- function(x, con, t="all", var="all", header=NULL, numt=NULL, dimension=TRUE, ts="last", reserve=0, keep.null=TRUE, dup=FALSE, endian=.Platform$endian, append=FALSE, ow=TRUE, keep.float=FALSE, use.raw=1e3, ...){
 	
-	############ AUTHOR(S): ############
-	# Arne Johannes Holmin
-	############ LANGUAGE: #############
-	# English
 	############### LOG: ###############
 	# Start: 2010-02-04 - Clean version.
 	# Update: 2010-06-17 - Lots of changes over the last months: (1) Default endianness changed to "big", because endianness is like Colins, "big" is better (and is best for windows, while ok for unix), (2) added the option 'reserve' for reserving header space to append data later, (3) added the C++ method "UpdateHeaderTSD" used when appending data of diffing variable lengths, (4) changed the dimensions of 'lvar' to [numt x nvar], and other stuff.
@@ -63,65 +97,19 @@ write.TSD <- function(x, con, t="all", var="all", header=NULL, numt=NULL, dimens
 	# Update: 2015-10-01 - Updated to treat stings simply by counting the number of characters (before the split character was included, but in the new version the character variables are collapsed to one sting per time step for each variable before using write.TSD_fun_lvar()).
 	# Update: 2016-07-04 - Fixed several bugs related to the use of 'numt' and 't', involving extracting 'lvar', 'singleindex' and dimensions first, and then subsetting these during writing.
 	# Last: 2017-10-10 - Multiple fixes: Generation of dimension vectors d000 streamlined and sped up by a factor of 100. This was done in functions write.TSD_get_d000_lv(), write.TSD_fun_d000(), write.TSD_modifyd000(), write.TSD_d000_lt2v(), and in this function, where x$d000Flat was introduced. Also the option use.raw was introduced, implying to convert the data into raw and write in one go, to avoid the for loop. This i currently not available for complex data. Considerably reduced time for 
-	########### DESCRIPTION: ###########
-	# Writes files using the Time Step Data format. See the documentation on echoIBM for specification of the Time Step Data format (TSD). Handling of missing values differ between data types, as given in the table below, which gives the values that are stored in the file when given as NA, NaN, NA_real_, or NA_integer_ in the data:
-	#	<value>				<data type>
-	#				floa	doub	shrt	long
-	#	NA			0		NaN		0		NA
-	#	NaN			NaN		NaN		0		NA
-	#	NA_real_	NaN		NA		0		NA
-	#	NA_integer_	NaN		NA		0		NA
-	# and similar for the complex data types.
-	########## DEPENDENCIES: ###########
-	# UpdateHeaderTSD()
-	############ DETAILS: ############
-	#
-	############ VALUE: ############
-	#
-	############ REFERENCES: ############
-	#
-	############ SEAALSO: ############
-	#
-	############ EXAMPLES: ############
-	#
-	############ VARIABLES: ############
-	# ---x--- is the list containing the data to write.
-	# ---con--- is the connection object or a character string naming the output file.
-	# ---t--- is a vector of the time steps to write (in the range [1, number of pings]). If none of the elements of 't' are in [1, number of pings], only the header is written. If t == "all", all time points are written and if t == "none", none of the time points are written.
-	# ---var--- is a vector of the variables to be written, either given as a character vector holding the names of the variables, as specified in the TSD-format, or as the number of the variables in 'labl', if 'labl' is known. If var == "all", all varialbes are written and if var == "none", none of the variables are written.
-	# ---header--- is a list containing one or more of the following two elements ("nvar" and "lvar" are always extracted from the data as of 2011-12-06):
-	#		"labl" (string vector of length 'nvar': labels of the variables)
-	#		"dtyp" (string vector of length 'nvar': TSD data type of the variables). If missing, the header is generated from 'x'.
-	# ---numt--- is the number of time points of the data 'x' overriding any existing information about the number of time steps, given in 'header' or 'x' (intended to only be specified if all time steps are arranged in the same vector for all variables).
-	# ---dimension--- is an object specifying whether the dimensions of the variables at each time step are to be stored in the file. 'dimension' may have 4 values:
-	#		1 - FALSE - no dimension data should be written to file.
-	#		2 - TRUE - dimension data to be extracted from the data.
-	#		3 - A vector of values specifying the dimensions of the data. These values must agree with the data. Given as c(narrays_1, ndims_1, indx_1, dims_1, narrays_2, ndims_2, indx_2, dims_2, ... , narrays_numt, ndims_numt, indx_numt, dims_numt), where 'narrays_p' is the number of variables at time step 'p' that have dimension (vectors are not regarded av having dimension, corresponding to the dim() function), 'ndims_p' is the number of dimensions for each variable at time step 'p', 'indx_p' is the index numbers for the variables that posess dimension at time step 'p', and 'dims_p' are the dimension values for the variables indexed by 'indx_p' at time step 'p', collapsed into a vector.
-	#		4 - A list of 'nvar' lists of lengths 'numt', holding the dimensions of the variables at all time steps.
-	# ---ts--- is a numeric vector specifying the rules for regarding the last dimensions of arrays as time: If the number of dimensions of an array is included in the set 'ts' the last dimension of that array is considered to be along time, so that if ts = 3 and we wish to write an array of dimension [3, 4, 2], this array will be written as two [3, 4] arrays. 'ts' is utilized through seq_along(dim(x))[ts], so that if ts = -2 matrices are not regarded as having time along the second dimension.
- 	# - ---reserve' is the number of time steps to reserve for future appending to the file (in which case 'reserve' rows of zeros are appended in 'lvar' in the header).
- 	# - ---keep.null' is FALSE if elements of length 0 should be discarded from the data, in which case a numerical 'var' would represent indices of 'x' AFTER empty elements have been removed.
- 	# - ---dup' is TRUE to allow for duplicated variable label. If dup = FALSE (default) all variables with the same label as a previous variable in the input list 'x' are removed.
- 	# - ---endian' is the endian of the file, defaulted to .Platform$endian (changed from "big" by Arne Johannes Holmin 2012-07-31).
-	# ---append--- is TRUE if data is to be appended to the end of 'con' (only valid when 'con' is a character string), in which case the header is not written. No check made for compatibility to the existing file.
-	# ---ow--- is TRUE if the user wish to overwrite existing file.
-	# ---...--- is to allow variables passed on from other methods.
 	
-
-	##################################################
-	##################################################
 	##### Preparation #####
 	split_char <- "\u001F"
 	### Connection: ###
 	# Get the name of the file:
-	if("file" %in% is(con)){
+	if("file" %in% class(con)){
 		conname <- summary(con)$description
 		close(con)
 	}
 	else if(is.character(con)){
 		conname <- con
 		if(!ow && !append && file.exists(conname)){
-			stop(paste("Cannot overwrite existing file ", conname, ". To allow owerwriting set the option 'ow' to TRUE", sep=""))
+			stop(paste0("Cannot overwrite existing file ", conname, ". To allow owerwriting set the option 'ow' to TRUE"))
 		}
 	}
 	else{
@@ -173,14 +161,14 @@ write.TSD <- function(x, con, t="all", var="all", header=NULL, numt=NULL, dimens
 	# If not given or not of the same length as the non-header elements of 'x', the variable labels are read from the names of 'x' (only four character names written):
 	if(length(header$labl)!= header$nvar){
 		if(length(header$labl)>0){
-			warning(paste("Variable labels specified in 'header' do not match the data (number of variables = ", header$nvar, ", length of header$labl = ", length(header$labl), ")", sep=""))
+			warning(paste0("Variable labels specified in 'header' do not match the data (number of variables = ", header$nvar, ", length of header$labl = ", length(header$labl), ")"))
 		}
 		header$labl <- names(x)
 	}
 	# Remove all variables with non-four-character labels:
 	if(any(nchar(header$labl)!= 4)){
 		fourcharind <- nchar(header$labl) == 4
-		#warning(paste("Only elements having 4 character names written to file: (\"", paste(header$labl[!fourcharind], collapse = "\", \""), "\")", sep = ""))
+		#warning(paste0("Only elements having 4 character names written to file: (\"", paste(header$labl[!fourcharind], collapse = "\", \""), "\")"))
 		x <- x[fourcharind]
 		header$labl <- header$labl[fourcharind]
 		header$nvar <- as.double(length(x))
@@ -207,7 +195,7 @@ write.TSD <- function(x, con, t="all", var="all", header=NULL, numt=NULL, dimens
 			header["dtyp"] <- list(NULL)
 		}
 		if(length(header$dtyp)>0){
-			warning(paste("Variable types specified in 'header' do not match the data (number of variables = ", header$nvar, ", length of header$dtyp = ", length(header$dtyp), ")", sep=""))
+			warning(paste0("Variable types specified in 'header' do not match the data (number of variables = ", header$nvar, ", length of header$dtyp = ", length(header$dtyp), ")"))
 		}
 		# 'timeind' are the indices of the time variables, 'charind' are the indices og the character variables and 'intind' are the indices og the integer variables:
 		timeind <- header$labl %in% c("mtim", "utim", "utmp", "utma", "ctim", "ftim", "imtm", "iutm", "ictm", "iftm", "u000")
@@ -428,14 +416,14 @@ write.TSD <- function(x, con, t="all", var="all", header=NULL, numt=NULL, dimens
 	if(append){
 		#tryCatch(con<-file(conname, "ab"), error=function(err) paste("Cannot open the connection", conname, "(package:TSD)"))
 		thisd <- try(con<-file(conname, "ab"), silent=TRUE)
-		if(is(thisd) == "try-error"){
+		if("try-error" %in% class(thisd)){
 			warning(paste("Cannot open the connection", conname, "(package:TSD)"))
 		}
 	}
 	else{
 		#tryCatch(con<-file(conname, "wb"), error=function(err) paste("Cannot open the connection", conname, "(package:TSD)"))
 		thisd <- try(con<-file(conname, "wb"), silent=TRUE)
-		if(is(thisd) == "try-error"){
+		if("try-error" %in% class(thisd)){
 			warning(paste("Cannot open the connection", conname, "(package:TSD)"))
 		}
 	}
@@ -490,7 +478,7 @@ write.TSD <- function(x, con, t="all", var="all", header=NULL, numt=NULL, dimens
 	
 	# If all variables are requested for a continuous sequence of time steps, and the number of values per time step is not high, read all the data as raw, and convert to the apropriate variables afterwards:
 	if(is.numeric(use.raw)){
-		use.raw <- sum(header$lvar[t[1],])<use.raw
+		use.raw <- sum(header$lvar[t[1],]) < use.raw
 	}
 	
 	if(use.raw && !any(arecomplex)){

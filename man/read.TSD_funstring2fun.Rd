@@ -2,7 +2,7 @@
 % Please edit documentation in R/read.TSD_funstring2fun.R
 \name{read.TSD_funstring2fun}
 \alias{read.TSD_funstring2fun}
-\title{Simple function for extracting the function saved as a string using function2character().}
+\title{Simple function for extracting the function saved as a string using \code{\link{function2character}}).}
 \usage{
 read.TSD_funstring2fun(x)
 }
@@ -13,9 +13,13 @@ read.TSD_funstring2fun(x)
 
 }
 \description{
-Simple function for extracting the function saved as a string using function2character().
+Simple function for extracting the function saved as a string using \code{\link{function2character}}).
 }
 \examples{
-\dontrun{}
+\dontrun{
+f <- function(s,r) s+2*r
+f <- function2character(f, "FUNCTION")
+read.TSD_funstring2fun(f)(13, 4)
+}
 
 }

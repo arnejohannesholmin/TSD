@@ -13,10 +13,11 @@
 \alias{decdeg2degminsec}
 \title{Conversions between cartesian and spheircal coordinate systems.}
 \usage{
-car2global(pos, origin = c(0, 0, 0), list.out = FALSE, format = c("dec",
-  "min", "sec"))
+car2global(pos, origin = c(0, 0, 0), list.out = FALSE,
+  format = c("dec", "min", "sec"))
 
-car2pol(x, y = NULL, perm = FALSE, nonneg = FALSE, list.out = FALSE)
+car2pol(x, y = NULL, perm = FALSE, nonneg = FALSE,
+  list.out = FALSE)
 
 car2sph(x, y = NULL, z = NULL, perm = FALSE, nonneg = FALSE,
   list.out = FALSE)
@@ -25,7 +26,8 @@ global2car(pos, origin = 1, list.out = FALSE)
 
 pol2car(r, theta = NULL, perm = FALSE, list.out = FALSE)
 
-sph2car(r, theta = NULL, phi = NULL, perm = FALSE, list.out = FALSE)
+sph2car(r, theta = NULL, phi = NULL, perm = FALSE,
+  list.out = FALSE)
 
 radiusEarth(lat, toaxis = FALSE)
 
@@ -44,31 +46,27 @@ decdeg2degminsec(decdeg, digits = 3)
 
 \item{format}{The return format, either dec = decimal degrees (default); min = degrees and decimal minutes; or sec = degrees, minutes and decimal seconds.}
 
-\item{x}{represents the points to transform, structured in one of the 4 following ways:}
+\item{x}{The points to transform, structured in one of the 4 following ways: (1) a vector of 'x' and/or 'y' and/or 'z'. (2) a matrix of columns representing 'x' and/or 'y' and/or 'z'. (3) a matrix of rows representing 'x' and/or 'y' and/or 'z', if which case perm needs to be TRUE. (4) a list of elements names "x", "y" and "z". 0 filled in for missing coordinates.}
 
-\item{y}{is a vector of y-values (optional).}
+\item{y}{The y coordinates, optional if x is an appropriate structure.}
 
-\item{perm}{is TRUE if the input points 'r' are given as a row matrix (see 'r').}
+\item{perm}{Logical: If TRUE the input points 'r' are given as a row matrix (see 'r').}
 
-\item{nonneg}{is TRUE if negative values of 'theta' should be added 2*pi.}
+\item{nonneg}{Logical: If TRUE negative values of 'theta' should be added 2*pi.}
 
-\item{r}{represents the points to transform, structured in one of the 4 following ways:}
+\item{z}{The z coordinates, optional if x is an appropriate structure.}
 
-\item{theta}{is a vector of theta-values (optional).}
+\item{r, theta, phi}{Spherical/polar coordinates, given as for x, y and z.}
 
-\item{phi}{is a vector of phi-values (optional).}
+\item{lat}{The vector of latitude values.}
 
-\item{lat}{is the vector of latitude values.}
+\item{toaxis}{Logical: If TRUE the radius to the axis of Earth is to be given.}
 
-\item{toaxis}{is TRUE if the radius to the axis of Earth is to be given.}
+\item{lon}{The vector of longitude values.}
 
-\item{lon}{is the vector of longitude values.}
-
-\item{digits}{is the number of digits in the output of \code{DD2DMS}.}
+\item{digits}{The number of digits in the output of \code{DD2DMS}.}
 
 \item{decdeg}{Positions given as a two (or three in the case that heave is given) column matrix of longitude and latitude in decimal degrees.}
-
-\item{list.out}{is TRUE if the output should be put in a list.}
 }
 \value{
 Position matrix in the requested format.

@@ -10,13 +10,15 @@ The calculation is done by the following procedure:
 setrange(x, a = 0, b = 1, clamp = NULL, check.ends = TRUE)
 }
 \arguments{
-\item{x}{is the input object. If all elements are equal, all elements are replaced by 'a'.}
+\item{x}{The input object. If all elements are equal, all elements are replaced by 'a'.}
 
-\item{a}{is the lower value of the new range, or the range if length(a)>1. Defaulted to 0.}
+\item{a}{The lower value of the new range, or the range if length(a)>1. Defaulted to 0.}
 
-\item{b}{is the upper value of the new range. Defaulted to 1.}
+\item{b}{The upper value of the new range. Defaulted to 1.}
 
-\item{clamp}{is either (1) a vector of two element setting the boundaries outside which the data are clamped to the boundary values, (2) a vector of three elements, indicating that the first two elements are in fraction of the data range, or (3) NULL to keep the original data. As an example, if x=c(-12,-4,-3,0,2,7), and clamp=c(-3,3), the 'x' is transformed to x=c(-3,-3,-3,0,2,3) before setting the range.}
+\item{clamp}{Either (1) a vector of two element setting the boundaries outside which the data are clamped to the boundary values, (2) a vector of three elements, indicating that the first two elements are in fraction of the data range, or (3) NULL to keep the original data. As an example, if x=c(-12,-4,-3,0,2,7), and clamp=c(-3,3), the 'x' is transformed to x=c(-3,-3,-3,0,2,3) before setting the range.}
+
+\item{check.ends}{Logical: If TRUE (default) chech that the end points are inside requested range.}
 }
 \value{
 

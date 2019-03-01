@@ -7,11 +7,13 @@
 ind2arr.ind(ind, shape = NULL, perm = NULL, ...)
 }
 \arguments{
-\item{ind}{is the index(es) to be transformed to array indexes.}
+\item{ind}{The index(es) to be transformed to array indexes.}
 
-\item{shape}{is the dimension of the array.}
+\item{shape}{The dimension of the array.}
 
-\item{perm}{is the permutation i. e. the order of the dimensions along which the indexes given in 'ind' are organized. If 'shape' is 2:4 and 'perm' is c(3,1,2), the indexes in 'ind' are first organized along the third dimension, then along the first, and finally along the second dimension of a matrix of dimensions 2:4.}
+\item{perm}{The permutation i. e. the order of the dimensions along which the indexes given in 'ind' are organized. If 'shape' is 2:4 and 'perm' is c(3,1,2), the indexes in 'ind' are first organized along the third dimension, then along the first, and finally along the second dimension of a matrix of dimensions 2:4.}
+
+\item{...}{Used for robustness.}
 }
 \value{
 

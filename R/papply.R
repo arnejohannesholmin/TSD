@@ -4,9 +4,11 @@
 #'
 #' Detects and opens cores for simpler parallel lapply.
 #'
-#' @param X,FUN,...  See lapply.
-#' @param cores  An integer giving the number of cores to run the function FUN over.
-#' @param outfile  Set this to FALSE to suppress printing from the cores.
+#' @param X,FUN,...	See lapply.
+#' @param cores		An integer giving the number of cores to run the function FUN over.
+#' @param outfile	Set this to FALSE to suppress printing from the cores.
+#' @param msg		A message to pring to the console, followed by the number of runs (and the number of cores in the case of parallel processing).
+#' @param pb		Logical: If FALSE suppress the progress bar.
 #'
 #' @return
 #'

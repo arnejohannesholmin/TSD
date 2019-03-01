@@ -4,8 +4,8 @@
 \alias{read.TSD_isnvar}
 \title{Function identifying whether a sequence of bytes of length 4*n at the current position is a float or not, and storing the item read.}
 \usage{
-read.TSD_isnvar(con, n = 1L, endian = .Platform$endian, max_var = 1e+10,
-  fixed_endian = FALSE)
+read.TSD_isnvar(con, n = 1L, endian = .Platform$endian,
+  max_var = 1e+10, fixed_endian = FALSE)
 }
 \arguments{
 \item{con}{is a connection to a binary file, as returned by file(x,"rb").}
