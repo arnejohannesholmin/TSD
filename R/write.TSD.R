@@ -81,7 +81,6 @@ write.TSD <- function(x, con, t="all", var="all", header=NULL, numt=NULL, dimens
 	# Update: 2011-12-06 - Changed so that the only header variables that can be specified in 'header' are the data types 'dtyp' and the labels 'labl'. The number of variables and the lengths of the variables are extracted from the data in any case. All header variables specified in the data are ignored.
 	# Update: 2012-07-31 - Added transformation from double to integer when dtyp == "shrt".
 	# Update: 2013-07-16 - Removed 'split_char' and renamed 'collapse_char' to 'split_char'. Also changed the treatment of strings, so that the dimension of a string array is kept at each time step.
-	# Update: 2013-07-17 - Added "long" as a data type representing four byte long integer, since "shrt" only applies to integers with values in the range −32768 to 32767. Integers detected in 'x' are from now on written as "long", and writing integers as "shrt" requires specification of this in the header.
 	# Update: 2013-08-07 - Changed to write d000 at every time step (d000 = 0 at time steps where no dimenstion exists for any of the variables).
 	# Update: 2013-08-07 - Fixed bug related to d000.
 	# Update: 2013-08-13 - Added support for 'x' with variables not present in the existing file, or with order inconsistent with the variable order in the existing file, when append == TRUE.
