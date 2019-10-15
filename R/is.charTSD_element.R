@@ -14,35 +14,6 @@
 #'
 is.charTSD_element<-function(y){
 	
-	############ AUTHOR(S): ############
-	# Arne Johannes Holmin
-	############ LANGUAGE: #############
-	# English
-	############### LOG: ###############
-	# Start: 2014-10-17 - Clean version.
-	########### DESCRIPTION: ###########
-	# Simple function for determining whether an element of the data 'y' is of character type.
-	########## DEPENDENCIES: ###########
-	#
-	############ DETAILS: ############
-	# 
-	############ VALUE: ############
-	# 
-	############ REFERENCES: ############
-	#
-	############ SEAALSO: ############
-	#
-	############ EXAMPLES: ############
-	# is.charTSD_element("string")
-	# is.charTSD_element(3)
-	# is.charTSD_element(NA)
-	# is.charTSD_element(NULL)
-	############ VARIABLES: ############
-	# ---y--- is an R object.
-	
-
-	##################################################
-	##################################################
 	if(length(y)==0){
 		NA
 		}
@@ -56,6 +27,4 @@ is.charTSD_element<-function(y){
 			is.character(y)
 			}
 		}
-	##################################################
-	##################################################
 	}

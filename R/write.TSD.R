@@ -180,8 +180,11 @@ write.TSD <- function(x, con, t="all", var="all", header=NULL, numt=NULL, dimens
 		header$nvar <- as.double(length(x))
 	}
 	if(length(x)==0){
-		# 0Write the TSD file format identifyer (magic number):
-		writeChar("%TSD", con, 4, eos=NULL)
+		# Write the TSD file format identifyer (magic number):
+		warning("No four character named elements present in the input 'x'")
+		if(!append){
+			writeChar("%TSD", con, 4, eos=NULL)
+		}
 		return(4)
 	}
 	
@@ -456,10 +459,12 @@ write.TSD <- function(x, con, t="all", var="all", header=NULL, numt=NULL, dimens
 	if(append){
 		# Update 'numt'. The 8 bytes are the "%TSD" string and the 'nvar' float:
 		UpdateHeaderTSD(conname, header_old$numt+header$numt, 8, endian)
+		
+		# Update 'lvar'. The 16 bytes are the "%TSD" string, the 'nvar' float, the 'numt' long, and the 'r000' long:
 		if(headerappend){
-			# Update 'lvar'. The 16 bytes are the "%TSD" string, the 'nvar' float, the 'numt' long, and the 'r000' long:
 			UpdateHeaderTSD(conname, c(t(lvarToAppend)), 16 + 4*header_old$numt*header_old$nvar, endian)
 		}
+		
 		# The code below did not work, so a C++ function is called (see "UpdateHeaderTSD.R"):
 		#seek(con, where <- 4+4*header_old$numt*header_old$nvar, origin = "start")
 		#writeBin(c(t(header$lvar)), con, size = 4, endian = endian)

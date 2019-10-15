@@ -16,34 +16,6 @@
 #'
 write.TSD_get_d000_lv<-function(y, numt, ts){
 	
-	############ AUTHOR(S): ############
-	# Arne Johannes Holmin
-	############ LANGUAGE: #############
-	# English
-	############### LOG: ###############
-	# Start: 2014-10-17 - Clean version.
-	########### DESCRIPTION: ###########
-	# Function for extracting the dimensions of 'x'.
-	########## DEPENDENCIES: ###########
-	#
-	############ DETAILS: ############
-	#
-	############ VALUE: ############
-	#
-	############ REFERENCES: ############
-	#
-	############ SEAALSO: ############
-	#
-	############ EXAMPLES: ############
-	#
-	############ VARIABLES: ############
-	# ---y--- is an R object accepted by write.TSD().
-	# ---numt' is the number of time steps.
-	# ---ts--- is a numeric vector specifying the rules for regarding the last dimensions of arrays as time: If the number of dimensions of an array is included in the set 'ts' the last dimension of that array is considered to be along time, so that if ts=3 and we wish to write an array of dimension [3, 4, 2], this array will be written as two [3, 4] arrays. 'ts' is utilized through seq_along(dim(x))[ts], so that if ts=-2 matrices are not regarded as having time along the second dimension.
- 	
-
-	##################################################
-	##################################################
 	# Get the dimensions from the data, one list element for each variable:	
 	dimension = lapply(y, write.TSD_fun_d000, numt=numt, ts=ts)
 	# Get the indices at which each variable has dimension. This is done by moving through the variables (elements in the list 'dimension') and for each element moving through the list of time steps and finding time steps with more than one dimension:
@@ -60,9 +32,7 @@ write.TSD_get_d000_lv<-function(y, numt, ts){
 		thisindx = indx[[i]]
 		dimension[[i]] = thisdimension[thisindx]
 		#dimension[[i]] = dimension[[i]][[indx[[dimension[[i]]]]]]
-		}
+	}
 	# Output the list of dimensions:
 	list(var=var, indx=indx, dims=dimension)
-	##################################################
-	##################################################
-	}
+}

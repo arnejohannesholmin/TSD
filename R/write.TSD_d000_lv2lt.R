@@ -15,37 +15,10 @@
 #'
 write.TSD_d000_lv2lt<-function(d000l, numt){
 	
-	############ AUTHOR(S): ############
-	# Arne Johannes Holmin
-	############ LANGUAGE: #############
-	# English
-	############### LOG: ###############
-	# Start: 2014-10-17 - Clean version.
-	########### DESCRIPTION: ###########
-	# List representation as a function of variables -> list representation as a function of time steps.
-	########## DEPENDENCIES: ###########
-	#
-	############ DETAILS: ############
-	#
-	############ VALUE: ############
-	#
-	############ REFERENCES: ############
-	#
-	############ SEAALSO: ############
-	#
-	############ EXAMPLES: ############
-	#
-	############ VARIABLES: ############
-	# ---d000l--- is a list of dimension information, as returnerd from write.TSD_get_d000_lv().
-	# ---numt--- is the number of time steps.
-	
-
-	##################################################
-	##################################################
 	if(length(d000l) == 3){
 		if(length(d000l$var) == 0){
 			return(list(var=list(), dims=list()))
-			}
+		}
 		var = vector("list", numt)
 		# 'Uindx' is the time indices at which dimension data are stored for the variables. 'ovar' is the order in which to sort the data, which is the actual transformation from variable sorting to time step sorting:
 		Uindx = unlist(d000l$indx)
@@ -64,12 +37,10 @@ write.TSD_d000_lv2lt<-function(d000l, numt){
 		D[sort(unique(Uindx))] = split(d[ovar], Uindx[ovar])
 		# Output:
 		list(var=var, dims=D)
-		}
+	}
 	# Return the input if not given as a list of 3 elements of the proper names:
 	else{
 		warning("Input must be a list of 3 elements named \"var\", \"indx\" and \"dims\"")
 		d000l
-		}
-	##################################################
-	##################################################
 	}
+}

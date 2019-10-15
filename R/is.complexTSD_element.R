@@ -14,35 +14,6 @@
 #'
 is.complexTSD_element<-function(y){
 	
-	############ AUTHOR(S): ############
-	# Arne Johannes Holmin
-	############ LANGUAGE: #############
-	# English
-	############### LOG: ###############
-	# Start: 2014-11-26 - Clean version.
-	########### DESCRIPTION: ###########
-	# Simple function for determining whether an element of the data 'y' is of complex type.
-	########## DEPENDENCIES: ###########
-	#
-	############ DETAILS: ############
-	#
-	############ VALUE: ############
-	#
-	############ REFERENCES: ############
-	#
-	############ SEAALSO: ############
-	#
-	############ EXAMPLES: ############
-	# is.complexTSD_element(complex(3))
-	# is.complexTSD_element(3)
-	# is.complexTSD_element(NA)
-	# is.complexTSD_element(NULL)
-	############ VARIABLES: ############
-	# ---y--- is an R object.
-	
-
-	##################################################
-	##################################################
 	if(length(y)==0){
 		NA
 		}
@@ -56,6 +27,4 @@ is.complexTSD_element<-function(y){
 			is.complex(y)
 			}
 		}
-	##################################################
-	##################################################
 	}

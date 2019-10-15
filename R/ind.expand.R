@@ -19,31 +19,12 @@
 #'
 ind.expand<-function(ind, dim, drop=FALSE, pad=c("end","start"), msg=FALSE, ...){
 	
-	############ AUTHOR(S): ############
-	# Arne Johannes Holmin
-	############ LANGUAGE: #############
-	# English
 	############### LOG: ###############
 	# Start: 2012-06-21 - Clean version.
 	# Update: 2012-09-02 - Added the option 'allow' for allowing 'ind' to be subset if it is too long for the dimension given. Else no subsetting is done.
 	# Update: 2013-08-27 - Added support for logical subscripts.
 	# Update: 2013-10-05 - Removed 'allow' and added 'drop'.
 	# Last: 2014-10-22 - Added 'pad'.
-	########### DESCRIPTION: ###########
-	# Expands a list of indexes as given to extract() to actual indexes as input to []. If given as a vector and not a list, 'ind' is assumed to represent the subset along the first dimension. Also if this is the case, and 'ind' is given as a single numeric, the 'ind' farthest values are selected, or the proportion 'ind' is ind<=1. This type of subset selection is not supported if 'ind' is a list. 
-	########## DEPENDENCIES: ###########
-	#
-	############ VARIABLES: ############
-	# ---ind--- is the index specifyer, given as a list of indexes, where negative represent exclusion, empty list elements, zeros, or FALSE represent no subset, and too high indexes are ignored. If 'ind' has length 0, all possible indices are retuned; if 'ind' is not list, it is transformed to list, and if ind has length shorter than the number of elements in 'dim', it is filled with empty list elements implying that all data are selected along those dimensions. If 'ind' is a single integer, this is interpreted as the number of indexes as counted from the end of the first dimenstion. Logical subscripts are allowed. There are pre-defined index-settings for different acoustical instruments:
-	#	"MS70": list(-(1:100),NULL)
-	#	"SX90": list(-(1:300),-(48:50))
-	#	"EK60": list(-(1:100),NULL)
-	#	"ME70": list(-(1:100),NULL)
-	# ---dim--- is the dimension of the array to subset.
-	# ---drop--- is TRUE for returning a vector if a list of only one element (one dimension) is returned.	
-	# ---pad--- determines at which end of the dimensions to pad with zeros if the length of 'ind' is shorter than the number of dimensions. Using pad="start" applies 'ind' on the last dimensions.	
-	# ---msg--- is FALSE to not print information about the sampling intervals selected by 'ind'.
-	# ---...--- is resent to allow passing variables from other functions to this function.
 	
 	##################################################
 	##################################################

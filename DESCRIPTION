@@ -10,6 +10,6 @@ Depends: R (>= 3.4.4)
 BugReports: https://github.com/arnejohannesholmin/TSD/issues
 License: LGPL-3
 LazyData: true
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 Imports:
 		pbapply

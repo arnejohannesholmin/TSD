@@ -18,36 +18,6 @@
 #'
 read.TSD_isnvar<-function(con, n=1L, endian=.Platform$endian, max_var=1e10, fixed_endian=FALSE){
 	
-	############ AUTHOR(S): ############
-	# Arne Johannes Holmin
-	############ LANGUAGE: #############
-	# English
-	############### LOG: ###############
-	# Start: 2014-10-17 - Clean version.
-	########### DESCRIPTION: ###########
-	# Function identifying whether a sequence of bytes of length 4*n at the current position is a float or not, and storing the item read.
-	########## DEPENDENCIES: ###########
-	#
-	############ DETAILS: ############
-	#
-	############ VALUE: ############
-	#
-	############ REFERENCES: ############
-	#
-	############ SEAALSO: ############
-	#
-	############ EXAMPLES: ############
-	#
-	############ VARIABLES: ############
-	# ---con--- is a connection to a binary file, as returned by file(x,"rb").
-	# ---n--- is the number of elements to read.
-	# ---endian--- is the endianness of the file, changed if the float is not read properly.
-	# ---max_var--- is the maximum value accepted as float.
-	# ---fixed_endian--- is TRUE if the endian should not be swaped, and readable set to FALSE for wrong endian.
-	
-
-	##################################################
-	##################################################
 	##### Preparation #####
 	readable = TRUE
 	
@@ -72,6 +42,4 @@ read.TSD_isnvar<-function(con, n=1L, endian=.Platform$endian, max_var=1e10, fixe
 			}
 		}
 	list(readable=readable, x=x, endian=endian)
-	##################################################
-	##################################################
-	}
+}

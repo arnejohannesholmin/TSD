@@ -15,40 +15,13 @@
 #'
 write.TSD_d000_lt2v<-function(d000l, numt){
 	
-	############ AUTHOR(S): ############
-	# Arne Johannes Holmin
-	############ LANGUAGE: #############
-	# English
-	############### LOG: ###############
-	# Start: 2014-10-17 - Clean version.
-	########### DESCRIPTION: ###########
-	# List representation of dimension data as a function of time steps -> vector representation.
-	########## DEPENDENCIES: ###########
-	#
-	############ DETAILS: ############
-	#
-	############ VALUE: ############
-	#
-	############ REFERENCES: ############
-	#
-	############ SEAALSO: ############
-	#
-	############ EXAMPLES: ############
-	#
-	############ VARIABLES: ############
-	# ---d000l--- is a list of dimension information, as returnerd from write.TSD_get_d000_lv().
-	# ---numt--- is the number of time steps.
-	
-
-	##################################################
-	##################################################
 	if(numt==0){
 		return(0)
-		}
+	}
 	# Return a vector of one 0 for each time step if no dimension data is present in the input:
 	else if(length(d000l$dim)==0){
 		return(double(numt))
-		}
+	}
 	ndims <- lapply(d000l$dim, function(y) if(is.list(y)) sapply(y, length) else length(y))
 	narrays <- unlist(lapply(ndims, function(y) length(y[sum(y)!=0])))
 	
@@ -66,6 +39,4 @@ write.TSD_d000_lt2v<-function(d000l, numt){
 	#		}
 	#	}
 	#out
-	##################################################
-	##################################################
-	}
+}

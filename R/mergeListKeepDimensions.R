@@ -19,23 +19,6 @@
 #'
 mergeListKeepDimensions<-function(x, pad=TRUE, add1=FALSE, split=TRUE){
 	
-	############ AUTHOR(S): ############
-	# Arne Johannes Holmin
-	############ LANGUAGE: #############
-	# English
-	############### LOG: ###############
-	# Start: 2015-04-23 - Clean version.
-	########### DESCRIPTION: ###########
-	# Funciton used for merging data stored in a list, where each list element contains data from one file
-	########## DEPENDENCIES: ###########
-	#
-	############ VARIABLES: ############
-	# ---x--- is a list containing some data that should be merged, and that preferably has equal dimension up to the last one (which might be missing). If not equal in dimension, 'pad' can be set to TRUE to pad with missing values.
-	# ---pad--- is TRUE to pad with missing values to make the list elements fit in the dimension up to the last dimension.
-	
-	
-	##################################################
-	##################################################
 	########## Preparation ##########
 	if(!is.list(x)){
 		return(x)
@@ -118,6 +101,4 @@ mergeListKeepDimensions<-function(x, pad=TRUE, add1=FALSE, split=TRUE){
 	
 	########## Output ##########
 	x
-	##################################################
-	##################################################
-	}
+}

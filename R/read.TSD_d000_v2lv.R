@@ -15,34 +15,7 @@
 #'
 read.TSD_d000_v2lv<-function(d000v, conname=NULL){
 	
-	############ AUTHOR(S): ############
-	# Arne Johannes Holmin
-	############ LANGUAGE: #############
-	# English
-	############### LOG: ###############
-	# Start: 2014-10-17 - Clean version.
-	########### DESCRIPTION: ###########
-	# Vector representation of dimension data -> list representation as a function of variables.
-	########## DEPENDENCIES: ###########
-	#
-	############ DETAILS: ############
-	#
-	############ VALUE: ############
-	#
-	############ REFERENCES: ############
-	#
-	############ SEAALSO: ############
-	#
-	############ EXAMPLES: ############
-	#
-	############ VARIABLES: ############
-	# ---d000v--- is the dimension vector given as c(narrays_1, ndims_1, indx_1, dims_1, narrays_2, ndims_2, indx_2, dims_2, ... , narrays_numt, ndims_numt, indx_numt, dims_numt), where 'narrays_p' is the number of variables at time step 'p' that have dimension (vectors are not regarded av having dimension, corresponding to the dim() function), 'ndims_p' is the number of dimensions for each variable at time step 'p', 'indx_p' is the indices for the variables that posess dimension at time step 'p', and 'dims_p' are the dimension values for the variables indexed by 'indx_p' at time step 'p'.
-	# ---conname--- is the file path of the connection from which the dimension data was read. Only used in the error message.
-	
-
-	##################################################
-	##################################################
-	##### Preparation #####
+		##### Preparation #####
 	# Length of the vector:
 	ldata <- length(d000v)
 	# Initialization:
@@ -99,6 +72,4 @@ read.TSD_d000_v2lv<-function(d000v, conname=NULL){
 	dims <- split(unlist(dims, recursive=FALSE), unlistindx)
 	# Output: 
 	list(var=var, indx=indx, dims=dims)
-	##################################################
-	##################################################
-	}
+}
