@@ -9,9 +9,6 @@ catchWarnings(expr)
 \arguments{
 \item{expr}{is an R-expression to be evaluated.}
 }
-\value{
-
-}
 \description{
 It returns a 2-element list, the first being the value of the expression given to it and the second being a list of all the warnings. catchWarnings() is based on suppressWarnings() and used similarly. Created by Bill Dunlap , TIBCO Software Inc - Spotfire Division , wdunlap tibco.com.
 }

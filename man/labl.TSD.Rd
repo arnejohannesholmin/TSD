@@ -13,9 +13,6 @@ labl.TSD(var = NULL, adds = NULL, list.out = TRUE)
 
 \item{list.out}{Logical: If FALSE, unlist the output when multiple elements are requested in var.}
 }
-\value{
-
-}
 \description{
 Returns the variable names required in echoIBM() and related functions, given as four character strings of names as stored in the TSD format. The aim of this function is to avoid errors due to misspelling.
 }

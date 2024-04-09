@@ -4,10 +4,21 @@
 \alias{read.TSD}
 \title{Reads a file using the Time Step Data format and outputs as an R-list object where the elements are named according to the four character names provided in the file 'con'. See the documentation on echoIBM for specification of the Time Step Data format (TSD). If reading large files, it can sometimes be faster to read all variables as opposed to some of  the variables. Reading all time steps of a certain segmentation file over 21601 time steps dropped from 26.958 sec to 6.864 sec (system.time(aa_new<-read.TSD("~/Data/echoIBM/SX90_biomassEstimation/Events/SX90_biomassEstimation_E0006_one_school_at_the_time_directional_fish_20logR/SX90/tsd/SX90_biomassEstimation_E0006_T00001_sfnr_0001.seg",t="all", header=FALSE, info=FALSE))).}
 \usage{
-read.TSD(con, t = 1, var = "all", dimension = TRUE, header = FALSE,
-  max_var = 1e+10, indt = FALSE, d000.out = FALSE,
-  keep.all = FALSE, drop.out = TRUE, info = FALSE,
-  silent = !getOption("verbose"), use.raw = 1000)
+read.TSD(
+  con,
+  t = 1,
+  var = "all",
+  dimension = TRUE,
+  header = FALSE,
+  max_var = 1e+10,
+  indt = FALSE,
+  d000.out = FALSE,
+  keep.all = FALSE,
+  drop.out = TRUE,
+  info = FALSE,
+  silent = !getOption("verbose"),
+  use.raw = 1000
+)
 }
 \arguments{
 \item{con}{is the file object or the name of the TSD-file to be read.}
@@ -35,9 +46,6 @@ read.TSD(con, t = 1, var = "all", dimension = TRUE, header = FALSE,
 \item{silent}{is FALSE to print progress bar. If the 'silent' should be set to FALSE in general, use options(verbose=TRUE).}
 
 \item{use.raw}{is TRUE to read files quicker by reading the information as raw, and converting to the appropriate data types aferwards, which olny applies if the number of time steps exceed 20 and the number of values of the file does not exceed 'use.raw'.}
-}
-\value{
-
 }
 \description{
 Reads a file using the Time Step Data format and outputs as an R-list object where the elements are named according to the four character names provided in the file 'con'. See the documentation on echoIBM for specification of the Time Step Data format (TSD). If reading large files, it can sometimes be faster to read all variables as opposed to some of  the variables. Reading all time steps of a certain segmentation file over 21601 time steps dropped from 26.958 sec to 6.864 sec (system.time(aa_new<-read.TSD("~/Data/echoIBM/SX90_biomassEstimation/Events/SX90_biomassEstimation_E0006_one_school_at_the_time_directional_fish_20logR/SX90/tsd/SX90_biomassEstimation_E0006_T00001_sfnr_0001.seg",t="all", header=FALSE, info=FALSE))).

@@ -13,21 +13,22 @@
 \alias{decdeg2degminsec}
 \title{Conversions between cartesian and spheircal coordinate systems.}
 \usage{
-car2global(pos, origin = c(0, 0, 0), list.out = FALSE,
-  format = c("dec", "min", "sec"))
+car2global(
+  pos,
+  origin = c(0, 0, 0),
+  list.out = FALSE,
+  format = c("dec", "min", "sec")
+)
 
-car2pol(x, y = NULL, perm = FALSE, nonneg = FALSE,
-  list.out = FALSE)
+car2pol(x, y = NULL, perm = FALSE, nonneg = FALSE, list.out = FALSE)
 
-car2sph(x, y = NULL, z = NULL, perm = FALSE, nonneg = FALSE,
-  list.out = FALSE)
+car2sph(x, y = NULL, z = NULL, perm = FALSE, nonneg = FALSE, list.out = FALSE)
 
 global2car(pos, origin = 1, list.out = FALSE)
 
 pol2car(r, theta = NULL, perm = FALSE, list.out = FALSE)
 
-sph2car(r, theta = NULL, phi = NULL, perm = FALSE,
-  list.out = FALSE)
+sph2car(r, theta = NULL, phi = NULL, perm = FALSE, list.out = FALSE)
 
 radiusEarth(lat, toaxis = FALSE)
 

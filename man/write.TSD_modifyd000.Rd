@@ -11,9 +11,6 @@ write.TSD_modifyd000(y, lablPresent)
 
 \item{lablPresent}{is a vector of the labels present in the existing file.}
 }
-\value{
-
-}
 \description{
 When 'x' is given with variables in a dissimilar order than an existing file to which the data should be appended, modifyd000() alters the dimension information to match the existing file.
 }

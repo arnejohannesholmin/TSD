@@ -12,9 +12,6 @@ odd(x)
 \arguments{
 \item{x}{is the R-object to be checked for even or odd values.}
 }
-\value{
-
-}
 \description{
 Returning TRUE at all even or odd values.
 }

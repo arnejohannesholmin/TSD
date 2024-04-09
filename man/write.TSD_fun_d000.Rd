@@ -15,9 +15,6 @@ write.TSD_fun_d000(y, numt, ts, ind.out = FALSE)
 
 \item{ind.out}{Logical: If TRUE output indices instead of the dimensions.}
 }
-\value{
-
-}
 \description{
 Function extracting the dimensions of the variable (possibly list) 'y'.
 }

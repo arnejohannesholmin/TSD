@@ -15,9 +15,6 @@ repm(x, times = 1, byrow = FALSE, length.out = NULL)
 
 \item{length.out}{is the number of columns of the output matrix if byrow==FALSE, the number of rows of the output matrix if byrow==TRUE, and the length of the output vector if the input is a vector.}
 }
-\value{
-
-}
 \description{
 Matrix generalization of rep. If 'x' is a vector, the ordinary rep() is used.
 }

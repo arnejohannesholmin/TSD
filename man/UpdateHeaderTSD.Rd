@@ -15,9 +15,6 @@ UpdateHeaderTSD(filename, lvar, pos, endian = "big")
 
 \item{endian}{is the endian of the existing TSD file.}
 }
-\value{
-
-}
 \description{
 Updates headers of TSD files for which extra rows of zeros was reserved using the option 'reserve' in write.TSD. If fewer rows of zeros was reserved, than the number of time steps to append to the TSD file, UpdateHeaderTSD() will cause trouble.
 }

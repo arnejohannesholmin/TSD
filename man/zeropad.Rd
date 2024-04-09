@@ -11,9 +11,6 @@ zeropad(x, n = max(nchar(x)))
 
 \item{n}{is the number of characters in the returned strings.}
 }
-\value{
-
-}
 \description{
 Pads numerics with zeros at the beginning.
 }

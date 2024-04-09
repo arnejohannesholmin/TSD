@@ -11,9 +11,6 @@ write.TSD_d000_lt2v(d000l, numt)
 
 \item{numt}{is the number of time steps.}
 }
-\value{
-
-}
 \description{
 List representation of dimension data as a function of time steps -> vector representation.
 }

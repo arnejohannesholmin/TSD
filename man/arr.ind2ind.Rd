@@ -11,9 +11,6 @@ arr.ind2ind(arr.ind, shape)
 
 \item{shape}{is the dimension of the array.}
 }
-\value{
-
-}
 \description{
 Transforms array indexes to vector indexes. For indexes out of bounds NA is returned. The function is transformed from the function which().
 }

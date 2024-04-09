@@ -9,9 +9,6 @@ is.doubleTSD_element(y)
 \arguments{
 \item{y}{is an R object.}
 }
-\value{
-
-}
 \description{
 Simple function for determining whether an element of the data 'y' is too large to be represented as float with presicion for whole numbers.
 }

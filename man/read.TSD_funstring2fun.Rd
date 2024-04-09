@@ -9,9 +9,6 @@ read.TSD_funstring2fun(x)
 \arguments{
 \item{x}{is a function string.}
 }
-\value{
-
-}
 \description{
 Simple function for extracting the function saved as a string using \code{\link{function2character}}).
 }

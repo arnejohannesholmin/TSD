@@ -15,9 +15,6 @@ prettyIntegers(x, force = FALSE, collapse = ", ", sep = "...")
 
 \item{sep}{The string to separate numbers by when printing ranges.}
 }
-\value{
-
-}
 \description{
 Compressed formating of an integer vector.
 }

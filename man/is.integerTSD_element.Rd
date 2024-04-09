@@ -9,9 +9,6 @@ is.integerTSD_element(y)
 \arguments{
 \item{y}{is an R object.}
 }
-\value{
-
-}
 \description{
 Simple function for determining whether an element of the data 'y' is of integer type.
 }

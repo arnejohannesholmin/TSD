@@ -15,9 +15,6 @@ write.TSD_get_ts(d, ts, numt = NULL, ischar = FALSE)
 
 \item{ischar}{is TRUE if the variable is character, in which case all string elements are collapsed to one vector if 'numt' is given in write.TSD() and does not fit the length of the string vector.}
 }
-\value{
-
-}
 \description{
 (Internal:) Get the 'ts' object, which defines along which dimension time steps are organized.
 }

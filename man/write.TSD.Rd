@@ -4,11 +4,25 @@
 \alias{write.TSD}
 \title{Writes files using the Time Step Data format.}
 \usage{
-write.TSD(x, con, t = "all", var = "all", header = NULL,
-  numt = NULL, dimension = TRUE, ts = "last", reserve = 0,
-  keep.null = TRUE, dup = FALSE, endian = .Platform$endian,
-  append = FALSE, ow = TRUE, keep.float = FALSE, use.raw = 1000,
-  ...)
+write.TSD(
+  x,
+  con,
+  t = "all",
+  var = "all",
+  header = NULL,
+  numt = NULL,
+  dimension = TRUE,
+  ts = "last",
+  reserve = 0,
+  keep.null = TRUE,
+  dup = FALSE,
+  endian = .Platform$endian,
+  append = FALSE,
+  ow = TRUE,
+  keep.float = FALSE,
+  use.raw = 1000,
+  ...
+)
 }
 \arguments{
 \item{x}{is the list containing the data to write.}
@@ -44,9 +58,6 @@ write.TSD(x, con, t = "all", var = "all", header = NULL,
 \item{use.raw}{Either a logical where TRUE reads the time steps (which must be in a sequence) first and then converts to appropriate values, or as the total numer of values of each time step below which the raw method is used.}
 
 \item{...}{is to allow variables passed on from other methods.}
-}
-\value{
-
 }
 \description{
 See the documentation on echoIBM for specification of the Time Step Data format (TSD). Handling of missing values differ between data types, as given in the table below, which gives the values that are stored in the file when given as NA, NaN, NA_real_, or NA_integer_ in the data:

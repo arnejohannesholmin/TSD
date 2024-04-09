@@ -15,9 +15,6 @@ strff(first, str, n = NULL, ignore.case = TRUE)
 
 \item{ignore.case}{is FALSE for case sensitivity.}
 }
-\value{
-
-}
 \description{
 Returns TRUE if any of the strings of 'first' occur as the first characters of the strings of 'str'.
 }

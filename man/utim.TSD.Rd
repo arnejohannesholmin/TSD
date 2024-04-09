@@ -26,8 +26,15 @@ mtim.TSD(data, keep.list = FALSE, ...)
 
 utim2mtim(x, ...)
 
-utim2ftim(x, format = "yyyymmddHHMMSS.FFF", digits = 3, indt = NULL,
-  split = FALSE, numeric = FALSE, ...)
+utim2ftim(
+  x,
+  format = "yyyymmddHHMMSS.FFF",
+  digits = 3,
+  indt = NULL,
+  split = FALSE,
+  numeric = FALSE,
+  ...
+)
 
 utim2FILETIME(x, xBase = -11644473600, tz = "UTC")
 
@@ -39,8 +46,15 @@ ftim2utim(x, ...)
 
 mtim2FILETIME(x, xBase = -11644473600, tz = "UTC")
 
-mtim2ftim(x, format = "yyyymmddHHMMSS.FFF", digits = 3, indt = NULL,
-  split = FALSE, numeric = FALSE, ...)
+mtim2ftim(
+  x,
+  format = "yyyymmddHHMMSS.FFF",
+  digits = 3,
+  indt = NULL,
+  split = FALSE,
+  numeric = FALSE,
+  ...
+)
 
 mtim2utim(x, ...)
 
@@ -72,9 +86,6 @@ interpret.mtim(x)
 \item{xBase}{is the base of Windows FILETIME: xBase=unclass(as.POSIXct('1601-1-1', tz="UTC"))[1].}
 
 \item{tz}{is the the time zone. Overrides 'xBase' if not given as tz="UTC". See as.POSIXlt().}
-}
-\value{
-
 }
 \description{
 \code{utim.TSD} Transforms time input in TSD format to unix time. If Matlab time 'mtim' is given, it is assumed to be in UTC.

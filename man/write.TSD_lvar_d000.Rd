@@ -11,9 +11,6 @@ write.TSD_lvar_d000(d000, numt)
 
 \item{numt}{is the number of time steps.}
 }
-\value{
-
-}
 \description{
 Simple function for extracting the lengths of the dimension variable at each time step.
 }

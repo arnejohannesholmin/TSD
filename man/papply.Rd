@@ -17,9 +17,6 @@ papply(X, FUN, ..., cores = 1, outfile = "", msg = NULL, pb = TRUE)
 
 \item{pb}{Logical: If FALSE suppress the progress bar.}
 }
-\value{
-
-}
 \description{
 Detects and opens cores for simpler parallel lapply.
 }

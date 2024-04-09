@@ -13,9 +13,6 @@ write.TSD_get_d000_lv(y, numt, ts)
 
 \item{ts}{is a numeric vector specifying the rules for regarding the last dimensions of arrays as time: If the number of dimensions of an array is included in the set 'ts' the last dimension of that array is considered to be along time, so that if ts=3 and we wish to write an array of dimension [3, 4, 2], this array will be written as two [3, 4] arrays. 'ts' is utilized through seq_along(dim(x))[ts], so that if ts=-2 matrices are not regarded as having time along the second dimension.}
 }
-\value{
-
-}
 \description{
 Function for extracting the dimensions of 'x'.
 }
