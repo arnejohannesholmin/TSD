@@ -11,9 +11,6 @@ ang2rot(ang, tol = 5)
 
 \item{tol}{is the angle difference defined as representing change from -pi to pi, or pi to -pi.}
 }
-\value{
-
-}
 \description{
 Transforms from angles in the range [-pi,pi] to angles of rotation, so that when circling around an object, the angle increases beyond this range.
 }

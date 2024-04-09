@@ -11,9 +11,6 @@ function2character(x, fname = "")
 
 \item{fname}{is the optional function name.}
 }
-\value{
-
-}
 \description{
 Converts a function to a string starting with " <- function", which can be sourced by R if pasted a name for the function prior to the string.
 }

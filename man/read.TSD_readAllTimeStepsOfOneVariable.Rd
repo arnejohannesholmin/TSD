@@ -4,8 +4,18 @@
 \alias{read.TSD_readAllTimeStepsOfOneVariable}
 \title{(Internal) Read all time steps of one variable in a TSD file.}
 \usage{
-read.TSD_readAllTimeStepsOfOneVariable(numtInFile, lvar, labl, con, index,
-  dtyp, datatypes, datasizes, endian, arecomplex)
+read.TSD_readAllTimeStepsOfOneVariable(
+  numtInFile,
+  lvar,
+  labl,
+  con,
+  index,
+  dtyp,
+  datatypes,
+  datasizes,
+  endian,
+  arecomplex
+)
 }
 \arguments{
 \item{numtInFile}{The number of time steps in the file.}
@@ -27,9 +37,6 @@ read.TSD_readAllTimeStepsOfOneVariable(numtInFile, lvar, labl, con, index,
 \item{endian}{The endianness of the file, changed if the float is not read properly.}
 
 \item{arecomplex}{Logical vector labeling variables as complex type.}
-}
-\value{
-
 }
 \description{
 (Internal) Read all time steps of one variable in a TSD file.

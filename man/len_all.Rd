@@ -9,9 +9,6 @@ len_all(x)
 \arguments{
 \item{x}{is the input object.}
 }
-\value{
-
-}
 \description{
 Returns the lengths of the object 'x'.
 }

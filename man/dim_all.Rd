@@ -13,9 +13,6 @@ dim_all(x, null.out = NULL, old = TRUE)
 
 \item{old}{Deprecated. Logical: If TRUE use the old function.}
 }
-\value{
-
-}
 \description{
 Returns the dimension of the object 'x'. If 'x' is a list, a list of dimensions is returned. If 'x' is a vector length(x) is returned. If 'x' is NULL, 'null.out' is returned.
 }

@@ -9,9 +9,6 @@ vecRealImaginary2complex(x)
 \arguments{
 \item{x}{is a vector where the first half is the real part and the second half is the imaginary part.}
 }
-\value{
-
-}
 \description{
 Converts to complex from data stored with the real in the first half and the imaginary in the second part of the vector 'x'.
 }

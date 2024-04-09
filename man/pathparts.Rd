@@ -9,9 +9,6 @@ pathparts(x)
 \arguments{
 \item{x}{is a vector of file paths.}
 }
-\value{
-
-}
 \description{
 Splits file paths into parts. If only one file path is given, a vector is returned. If multiple file paths are given in a vector, a list is returned.
 }

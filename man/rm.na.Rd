@@ -9,9 +9,6 @@ rm.na(x)
 \arguments{
 \item{x}{Input object.}
 }
-\value{
-
-}
 \description{
 Removing NAs, returning a vector. Not used since na.omit() serves the same purpose.
 }

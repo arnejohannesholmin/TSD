@@ -62,7 +62,7 @@ labl.TSD <- function(var=NULL, adds=NULL, list.out=TRUE){
 	voxelsnames <- c("psxx", "psyx", "pszx", "volx", "harx")
 	# Noise variables
 	bgnsnames <- c("bgns", "badb", "pns1", "pns2", "pns3", "harm", "rspd", "rsdM", "bgnM", "bgn0", "bg0M", "pn1M", "pn2M", "pn3M", "pn3I", "pn30", "harM", "hM12", "DPrf", "mDrf", "acfq", "LOWP", "BEGP", "UPPP", "fnvb", "fnvp", "fnvt", "ntry", "NTRY", "FTth", "prex", "pn2I")
-	nrnsnames <- c("nrns", "nrn0", "snrn", "snr0", "thrn", "thrs", "zers")
+	nrnsnames <- c("nrns", "nrn0", "snrn", "snr0", "thrn", "thrs", "zers", "utim")
 	nrnpnames <- c("nrnp", "nr0p", "snrp", "sn0p", "thrp", "thps", "zerp", "utmp")
 	nrnanames <- c("nrna", "nr0a", "snra", "sn0a", "thra", "thas", "zera", "utma")
 	hinsnames <- c("hins", "hini", "HINS")

@@ -11,9 +11,6 @@ read.TSD_d000_v2lv(d000v, conname = NULL)
 
 \item{conname}{is the file path of the connection from which the dimension data was read. Only used in the error message.}
 }
-\value{
-
-}
 \description{
 Vector representation of dimension data -> list representation as a function of variables.
 }

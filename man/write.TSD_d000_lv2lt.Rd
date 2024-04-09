@@ -11,9 +11,6 @@ write.TSD_d000_lv2lt(d000l, numt)
 
 \item{numt}{is the number of time steps.}
 }
-\value{
-
-}
 \description{
 List representation as a function of variables -> list representation as a function of time steps.
 }

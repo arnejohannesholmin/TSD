@@ -20,9 +20,6 @@ setrange(x, a = 0, b = 1, clamp = NULL, check.ends = TRUE)
 
 \item{check.ends}{Logical: If TRUE (default) chech that the end points are inside requested range.}
 }
-\value{
-
-}
 \description{
 Sets the range of the input object 'x' to [a,b] (stretching or shrinking and displacing 'x').
 The calculation is done by the following procedure:

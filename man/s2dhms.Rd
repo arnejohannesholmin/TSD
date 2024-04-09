@@ -5,11 +5,23 @@
 \alias{m2dhm}
 \title{Transforms seconds to an array of days, hours, minutes and seconds.}
 \usage{
-s2dhms(sec, digits = 3, clock.out = FALSE, names = c("d", "h", "m",
-  "s"), strip = FALSE, drop = FALSE)
+s2dhms(
+  sec,
+  digits = 3,
+  clock.out = FALSE,
+  names = c("d", "h", "m", "s"),
+  strip = FALSE,
+  drop = FALSE
+)
 
-m2dhm(m, digits = 3, clock.out = FALSE, names = c("d", "h", "m"),
-  strip = FALSE, drop = FALSE)
+m2dhm(
+  m,
+  digits = 3,
+  clock.out = FALSE,
+  names = c("d", "h", "m"),
+  strip = FALSE,
+  drop = FALSE
+)
 }
 \arguments{
 \item{sec}{The input seconds.}
@@ -23,9 +35,6 @@ m2dhm(m, digits = 3, clock.out = FALSE, names = c("d", "h", "m"),
 \item{strip, drop}{Logical: If TRUE strip off e.g. hours when 0, and in that case drop the output if drop=TRUE.}
 
 \item{m}{The input minutes.}
-}
-\value{
-
 }
 \description{
 Transforms seconds to an array of days, hours, minutes and seconds.

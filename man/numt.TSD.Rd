@@ -9,9 +9,6 @@ numt.TSD(x)
 \arguments{
 \item{x}{is a list containing the required variables 'dirx' (vector of x-beam-directions), 'diry' (vector of y-beam-directions), 'dirz' (vector of z-beam-directions), and 'esnm' (name of the echosounder/sonar).}
 }
-\value{
-
-}
 \description{
 Get the number of time steps.
 }

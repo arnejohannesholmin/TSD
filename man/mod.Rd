@@ -9,9 +9,6 @@ mod(x, y)
 \arguments{
 \item{x, y}{The input vectors.}
 }
-\value{
-
-}
 \description{
 (Internal) Returns the modulus of x by y, but keeping y when x<percent><percent>y returns 0.
 }

@@ -4,9 +4,17 @@
 \alias{extractIndSubset}
 \title{Extracts a subset of 'x' defined by the index list or vector 'ind' and/or the logical vector 'subset'.}
 \usage{
-extractIndSubset(x, ind = list(), subset = NULL, drop = TRUE,
-  ind.out = FALSE, insert.NA = FALSE, only.match = FALSE,
-  return.all = TRUE, pad = c("end", "start"))
+extractIndSubset(
+  x,
+  ind = list(),
+  subset = NULL,
+  drop = TRUE,
+  ind.out = FALSE,
+  insert.NA = FALSE,
+  only.match = FALSE,
+  return.all = TRUE,
+  pad = c("end", "start")
+)
 }
 \arguments{
 \item{x}{is the list or array to be extracted from.}
@@ -26,9 +34,6 @@ extractIndSubset(x, ind = list(), subset = NULL, drop = TRUE,
 \item{return.all}{is FALSE to return empty data and indices when 'ind' and 'subset' are enpty.}
 
 \item{pad}{determines at which end of the dimensions to pad with zeros if the length of 'ind' is shorter than the number of dimensions. Using pad="start" applies 'ind' on the last dimensions.}
-}
-\value{
-
 }
 \description{
 Extracts a subset of 'x' defined by the index list or vector 'ind' and/or the logical vector 'subset'.

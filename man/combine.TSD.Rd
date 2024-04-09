@@ -4,11 +4,27 @@
 \alias{combine.TSD}
 \title{Merges either (1) TSD files given by 'x', or (2) four character named TSD variables in the list 'x', as returned when reading mutiple TSD files. List elements of identical names are collapsed.}
 \usage{
-combine.TSD(x, dir = NULL, indt = FALSE, reserve = TRUE,
-  recursive = FALSE, test.TSD = FALSE, filesize = 3e+08,
-  chunksize = 3e+08, clear_along = FALSE, drop.out = FALSE,
-  adds = NULL, msg = TRUE, linked = list(), skipLast = FALSE,
-  cores = 1, keep.lists = FALSE, pad = TRUE, pbar = TRUE, ...)
+combine.TSD(
+  x,
+  dir = NULL,
+  indt = FALSE,
+  reserve = TRUE,
+  recursive = FALSE,
+  test.TSD = FALSE,
+  filesize = 3e+08,
+  chunksize = 3e+08,
+  clear_along = FALSE,
+  drop.out = FALSE,
+  adds = NULL,
+  msg = TRUE,
+  linked = list(),
+  skipLast = FALSE,
+  cores = 1,
+  keep.lists = FALSE,
+  pad = TRUE,
+  pbar = TRUE,
+  ...
+)
 }
 \arguments{
 \item{x}{A list of TSD-data, or a directory or vector of TSD-files to be merged, in which case a new directory is created with the merged data.}
@@ -48,9 +64,6 @@ combine.TSD(x, dir = NULL, indt = FALSE, reserve = TRUE,
 \item{pbar}{Logical: If FALSE, the progress bar is suppressed.}
 
 \item{...}{Possible inputs to other functions.}
-}
-\value{
-
 }
 \description{
 Merges either (1) TSD files given by 'x', or (2) four character named TSD variables in the list 'x', as returned when reading mutiple TSD files. List elements of identical names are collapsed.

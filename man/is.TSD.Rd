@@ -13,9 +13,6 @@ is.TSD(x, recursive = TRUE, accept.dir = TRUE)
 
 \item{accept.dir}{is TRUE to permit giving 'x' as a directory, which is only used for a special reason in read.TSD().}
 }
-\value{
-
-}
 \description{
 Tests whether the file(s) given by 'x' has the Time Step Data format (TSD) by reading the first four bytes as character and comparing to the TSD file header "\%TSD".
 }

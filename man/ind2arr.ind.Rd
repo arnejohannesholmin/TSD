@@ -15,9 +15,6 @@ ind2arr.ind(ind, shape = NULL, perm = NULL, ...)
 
 \item{...}{Used for robustness.}
 }
-\value{
-
-}
 \description{
 Transforms vector indexes to array indexes. The function is cloned from the function which().
 }

@@ -15,9 +15,6 @@ mergeListKeepDimensions(x, pad = TRUE, add1 = FALSE, split = TRUE)
 
 \item{split}{Logical: if TRUE, split each list element to have last dimenstion equal to 1.}
 }
-\value{
-
-}
 \description{
 Funciton used for merging data stored in a list, where each list element contains data from one file
 }

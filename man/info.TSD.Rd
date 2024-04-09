@@ -4,8 +4,12 @@
 \alias{info.TSD}
 \title{Reads the description of four character TSD file variables.}
 \usage{
-info.TSD(labl = NULL, file = file.path(system.file("extdata", package =
-  "TSD"), "TSD-format_names.dat"), info.out = FALSE, clean = FALSE)
+info.TSD(
+  labl = NULL,
+  file = file.path(system.file("extdata", package = "TSD"), "TSD-format_names.dat"),
+  info.out = FALSE,
+  clean = FALSE
+)
 }
 \arguments{
 \item{labl}{is the variable names to get the description of, or NULL to return all variables (default).}
@@ -15,9 +19,6 @@ info.TSD(labl = NULL, file = file.path(system.file("extdata", package =
 \item{info.out}{is TRUE if the information about the variable 'info' should be returned (seldom useful).}
 
 \item{clean}{is TRUE if only the information strings should be returned, and not added the variable name in <> at the start of each string.}
-}
-\value{
-
 }
 \description{
 Reads the description of four character TSD file variables.

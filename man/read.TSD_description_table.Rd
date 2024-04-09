@@ -9,9 +9,6 @@ read.TSD_description_table(x)
 \arguments{
 \item{x}{is the file containing a table of two columns named "Label" and "Description", specifying in the first column the TSD names, which are UTF-8 four character names, and in the second column the descriptions of the variables in the first column.}
 }
-\value{
-
-}
 \description{
 Reads the TSD description table 'x'.
 }

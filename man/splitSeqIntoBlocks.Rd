@@ -15,9 +15,6 @@ splitSeqIntoBlocks(t, size1, size, blocks = 1)
 
 \item{blocks}{(optional) if the number of blocks is lower than 'blocks', distribute evenly.}
 }
-\value{
-
-}
 \description{
 Splits a vector into groups based on the size of one element and a size limit.
 }
